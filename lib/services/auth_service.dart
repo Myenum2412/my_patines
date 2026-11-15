@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -29,6 +30,36 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    final result = await _postJson(
+      AppConfig.loginUri,
+      {
+        'email': email.trim(),
+        'password': password,
+      },
+    );
+    if (!result.success) return result;
+
+    return AuthResult(
+      success: true,
+      message: result.message,
+      token: _extractToken(result.data),
+      data: result.data,
+      statusCode: result.statusCode,
+    );
+  }
+
+  /// Asks the clinic to email a single-use password reset link.
+  ///
+  /// The server always returns a generic success message so the response
+  /// cannot be used to discover which accounts exist.
+  Future<AuthResult> requestPasswordReset({required String identifier}) {
+    return _postJson(
+      AppConfig.forgotPasswordUri,
+      {'identifier': identifier.trim()},
+    );
+  }
+
+  Future<AuthResult> _postJson(Uri uri, Map<String, dynamic> payload) async {
     final httpClient = client ?? http.Client();
     final ownClient = client == null;
     try {
@@ -41,14 +72,13 @@ class AuthService {
         headers['Authorization'] = 'Bearer ${AppConfig.apiKey}';
       }
 
-      final response = await httpClient.post(
-        AppConfig.loginUri,
-        headers: headers,
-        body: jsonEncode({
-          'email': email.trim(),
-          'password': password,
-        }),
-      );
+      final response = await httpClient
+          .post(
+            uri,
+            headers: headers,
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 30));
 
       Map<String, dynamic>? body;
       try {
@@ -61,21 +91,34 @@ class AuthService {
       }
 
       final ok = response.statusCode >= 200 && response.statusCode < 300;
-      final token = _extractToken(body);
-      final message = _extractMessage(body, response.body, ok);
-
       return AuthResult(
         success: ok,
-        message: message,
-        token: token,
+        message: _extractMessage(body, response.body, ok),
         data: body,
         statusCode: response.statusCode,
       );
-    } catch (e) {
-      return AuthResult(
+    } on TimeoutException {
+      return const AuthResult(
         success: false,
-        message: 'Unable to connect. Please check your network and try again.',
+        message:
+            'The server took too long to respond. Check your connection and try again.',
       );
+    } on http.ClientException {
+      return const AuthResult(
+        success: false,
+        message:
+            'No internet connection. Turn on Wi-Fi or mobile data and try again.',
+      );
+    } catch (e) {
+      final text = e.toString().toLowerCase();
+      final message = text.contains('socketexception') ||
+              text.contains('failed host lookup') ||
+              text.contains('network is unreachable') ||
+              text.contains('connection refused') ||
+              text.contains('connection closed')
+          ? 'No internet connection. Turn on Wi-Fi or mobile data and try again.'
+          : 'Unable to connect. Please check your network and try again.';
+      return AuthResult(success: false, message: message);
     } finally {
       if (ownClient) {
         httpClient.close();
