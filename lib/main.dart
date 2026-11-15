@@ -277,10 +277,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ],
                 ),
-                child: const Icon(
-                  Icons.local_hospital_rounded,
-                  color: Colors.white,
-                  size: 34,
+                padding: const EdgeInsets.all(12),
+                child: Image.asset(
+                  'assets/images/logo-mark.png',
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
