@@ -1066,9 +1066,36 @@ class PatientPortalService {
       final message = _extractMessage(body, response.body, status);
       throw PortalException(message, statusCode: status);
     } on TimeoutException {
-      throw const PortalException('Request timed out. Please check your internet connection.');
+      throw const PortalException(
+        'Request timed out. Please check your connection and try again.',
+      );
     } on http.ClientException catch (error) {
-      throw PortalException(error.message);
+      final text = error.message.toLowerCase();
+      final looksLikeNetwork = text.contains('socket') ||
+          text.contains('failed host lookup') ||
+          text.contains('network') ||
+          text.contains('connection refused') ||
+          text.contains('connection closed') ||
+          text.contains('connection reset') ||
+          text.contains('timed out');
+      throw PortalException(
+        looksLikeNetwork
+            ? 'Could not reach the clinic server. Please check your connection and try again.'
+            : 'Could not connect to the clinic server. Please try again.',
+      );
+    } catch (error) {
+      if (error is PortalException) rethrow;
+      final text = error.toString().toLowerCase();
+      final looksLikeNetwork = text.contains('socketexception') ||
+          text.contains('failed host lookup') ||
+          text.contains('network is unreachable') ||
+          text.contains('connection refused') ||
+          text.contains('connection reset');
+      throw PortalException(
+        looksLikeNetwork
+            ? 'Could not reach the clinic server. Please check your connection and try again.'
+            : 'Something went wrong. Please try again.',
+      );
     }
   }
 

@@ -204,8 +204,17 @@ class RecordsService {
         'Could not reach the clinic server. Please check your connection and try again.',
       );
     } catch (err) {
+      final text = err.toString().toLowerCase();
+      final looksLikeNetwork = text.contains('socketexception') ||
+          text.contains('failed host lookup') ||
+          text.contains('clientexception') ||
+          text.contains('network is unreachable') ||
+          text.contains('connection refused') ||
+          text.contains('connection reset');
       throw RecordsException(
-        'Could not load your records. Please check your connection and try again. ($err)',
+        looksLikeNetwork
+            ? 'Could not reach the clinic server. Please check your connection and try again.'
+            : 'Could not load your records. Please try again.',
       );
     }
   }
@@ -228,8 +237,17 @@ class RecordsService {
         'Could not reach the clinic server. Please check your connection and try again.',
       );
     } catch (err) {
+      final text = err.toString().toLowerCase();
+      final looksLikeNetwork = text.contains('socketexception') ||
+          text.contains('failed host lookup') ||
+          text.contains('clientexception') ||
+          text.contains('network is unreachable') ||
+          text.contains('connection refused') ||
+          text.contains('connection reset');
       throw RecordsException(
-        'Could not download this file. Please try again. ($err)',
+        looksLikeNetwork
+            ? 'Could not reach the clinic server. Please check your connection and try again.'
+            : 'Could not download this file. Please try again.',
       );
     }
   }
@@ -250,8 +268,17 @@ class RecordsService {
     } on TimeoutException {
       rethrow;
     } catch (err) {
+      final text = err.toString().toLowerCase();
+      final looksLikeNetwork = text.contains('socketexception') ||
+          text.contains('failed host lookup') ||
+          text.contains('clientexception') ||
+          text.contains('network is unreachable') ||
+          text.contains('connection refused') ||
+          text.contains('connection reset');
       throw RecordsException(
-        'Could not reach the clinic server. Please check your connection and try again. ($err)',
+        looksLikeNetwork
+            ? 'Could not reach the clinic server. Please check your connection and try again.'
+            : 'Could not reach the clinic server. Please try again.',
       );
     }
 

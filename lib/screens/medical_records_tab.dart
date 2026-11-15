@@ -49,12 +49,15 @@ class _MedicalRecordsTabState extends State<MedicalRecordsTab> {
       final updated = await _service.fetchAll();
       if (!mounted) return;
       setState(() => _future = Future.value(updated));
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
+      final message = error is RecordsException
+          ? error.message
+          : 'Could not refresh your medical records. Please try again.';
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Offline mode — showing saved medical records'),
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 3),
         ),
       );
     }
