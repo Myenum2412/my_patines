@@ -117,24 +117,18 @@ class AuthService {
       return const AuthResult(
         success: false,
         message:
-            'The server took too long to respond. Check your connection and try again.',
+            'The server took too long to respond. Please check your connection and try again.',
       );
-    } on http.ClientException {
-      return const AuthResult(
+    } on http.ClientException catch (e) {
+      return AuthResult(
         success: false,
-        message:
-            'No internet connection. Turn on Wi-Fi or mobile data and try again.',
+        message: _connectionErrorMessage(e.toString()),
       );
     } catch (e) {
-      final text = e.toString().toLowerCase();
-      final message = text.contains('socketexception') ||
-              text.contains('failed host lookup') ||
-              text.contains('network is unreachable') ||
-              text.contains('connection refused') ||
-              text.contains('connection closed')
-          ? 'No internet connection. Turn on Wi-Fi or mobile data and try again.'
-          : 'Unable to connect. Please check your network and try again.';
-      return AuthResult(success: false, message: message);
+      return AuthResult(
+        success: false,
+        message: _connectionErrorMessage(e.toString()),
+      );
     } finally {
       if (ownClient) {
         httpClient.close();
@@ -153,6 +147,34 @@ class AuthService {
       return _extractToken(data);
     }
     return null;
+  }
+
+  String _connectionErrorMessage(String raw) {
+    final text = raw.toLowerCase();
+    if (text.contains('handshakeexception') ||
+        text.contains('certificate') ||
+        text.contains('tls') ||
+        text.contains('ssl') ||
+        text.contains('cert_')) {
+      return 'Secure connection to the clinic server failed. Please try again later.';
+    }
+    if (text.contains('failed host lookup') ||
+        text.contains('network is unreachable') ||
+        text.contains('no address associated with hostname') ||
+        text.contains('nodename nor servname provided')) {
+      return 'Could not reach the clinic server. Please check your internet connection and try again.';
+    }
+    if (text.contains('socketexception') ||
+        text.contains('connection refused') ||
+        text.contains('connection timed out') ||
+        text.contains('timed out') ||
+        text.contains('software caused connection abort') ||
+        text.contains('connection reset') ||
+        text.contains('connection closed') ||
+        text.contains('broken pipe')) {
+      return 'Could not reach the clinic server. Please check your connection and try again.';
+    }
+    return 'Could not connect to the clinic server. Please try again.';
   }
 
   String _extractMessage(
