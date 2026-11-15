@@ -259,29 +259,10 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Center(
-              child: Container(
-                width: 68,
-                height: 68,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF0071E3), Color(0xFF4394FF)],
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppleColors.blue.withValues(alpha: 0.32),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Image.asset(
-                  'assets/images/logo-mark.png',
-                  fit: BoxFit.contain,
-                ),
+              child: Image.asset(
+                'assets/images/logo-wordmark.png',
+                height: 56,
+                fit: BoxFit.contain,
               ),
             ),
             const SizedBox(height: 22),
