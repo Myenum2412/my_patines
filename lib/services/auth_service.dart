@@ -36,6 +36,8 @@ class AuthService {
         'email': email.trim(),
         'password': password,
       },
+      successMessage: 'Login successful.',
+      failureMessage: 'Login failed. Please try again.',
     );
     if (!result.success) return result;
 
@@ -56,10 +58,18 @@ class AuthService {
     return _postJson(
       AppConfig.forgotPasswordUri,
       {'identifier': identifier.trim()},
+      successMessage:
+          "If an account exists for those details, we've sent a password reset link to the email on file.",
+      failureMessage: 'Could not send the reset link. Please try again.',
     );
   }
 
-  Future<AuthResult> _postJson(Uri uri, Map<String, dynamic> payload) async {
+  Future<AuthResult> _postJson(
+    Uri uri,
+    Map<String, dynamic> payload, {
+    required String successMessage,
+    required String failureMessage,
+  }) async {
     final httpClient = client ?? http.Client();
     final ownClient = client == null;
     try {
@@ -93,7 +103,13 @@ class AuthService {
       final ok = response.statusCode >= 200 && response.statusCode < 300;
       return AuthResult(
         success: ok,
-        message: _extractMessage(body, response.body, ok),
+        message: _extractMessage(
+          body,
+          response.body,
+          ok,
+          successMessage: successMessage,
+          failureMessage: failureMessage,
+        ),
         data: body,
         statusCode: response.statusCode,
       );
@@ -139,7 +155,13 @@ class AuthService {
     return null;
   }
 
-  String _extractMessage(Map<String, dynamic>? body, String raw, bool ok) {
+  String _extractMessage(
+    Map<String, dynamic>? body,
+    String raw,
+    bool ok, {
+    required String successMessage,
+    required String failureMessage,
+  }) {
     if (body != null) {
       for (final key in ['message', 'error', 'detail', 'msg']) {
         final value = body[key];
@@ -159,6 +181,6 @@ class AuthService {
     if (trimmed.isNotEmpty && trimmed.length < 200 && !trimmed.startsWith('{')) {
       return trimmed;
     }
-    return ok ? 'Login successful.' : 'Login failed. Please try again.';
+    return ok ? successMessage : failureMessage;
   }
 }
