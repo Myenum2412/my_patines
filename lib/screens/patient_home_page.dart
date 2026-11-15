@@ -1,14 +1,23 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../main.dart' show LoginPage;
+import '../models/patient_session.dart';
+import '../widgets/apple_ui.dart';
+import 'appointments_tab.dart';
+import 'billing_tab.dart';
+import 'home_tab.dart';
+import 'medical_records_tab.dart';
+import 'profile_tab.dart';
 
 class PatientHomePage extends StatefulWidget {
   const PatientHomePage({
     super.key,
+    this.session,
     this.userName,
     this.email,
   });
 
+  final PatientSession? session;
   final String? userName;
   final String? email;
 
@@ -19,196 +28,338 @@ class PatientHomePage extends StatefulWidget {
 class _PatientHomePageState extends State<PatientHomePage> {
   int _index = 0;
 
-  static const _titles = ['Home', 'Medical Record', 'Billing', 'Profile'];
+  final GlobalKey<HomeTabState> _homeKey = GlobalKey<HomeTabState>();
+  final GlobalKey<AppointmentsTabState> _appointmentsKey =
+      GlobalKey<AppointmentsTabState>();
+  final GlobalKey<BillingTabState> _billingKey = GlobalKey<BillingTabState>();
+
+  static const _titles = [
+    'Home',
+    'Appointments',
+    'Medical Record',
+    'Billing',
+    'Profile',
+  ];
+
+  void _selectTab(int index) {
+    if (index < 0 || index > 4 || index == _index) return;
+    setState(() => _index = index);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final session = widget.session;
     final pages = <Widget>[
-      _HomeTab(userName: widget.userName),
-      const _PlaceholderTab(
-        icon: Icons.folder_shared_outlined,
-        title: 'Medical Record',
-        description: 'Your medical records will appear here.',
-      ),
-      const _PlaceholderTab(
-        icon: Icons.receipt_long_outlined,
-        title: 'Billing',
-        description: 'Your billing details and invoices will appear here.',
-      ),
-      _ProfileTab(userName: widget.userName, email: widget.email),
+      if (session != null)
+        HomeTab(
+          key: _homeKey,
+          session: session,
+          onOpenTab: _selectTab,
+        )
+      else
+        const _PlaceholderTab(
+          icon: Icons.home_outlined,
+          title: 'Home',
+          description: 'Sign in again to see your dashboard.',
+        ),
+      if (session != null)
+        AppointmentsTab(
+          key: _appointmentsKey,
+          session: session,
+        )
+      else
+        const _PlaceholderTab(
+          icon: Icons.calendar_month_outlined,
+          title: 'Appointments',
+          description: 'Sign in again to see your tokens.',
+        ),
+      if (session != null)
+        MedicalRecordsTab(session: session)
+      else
+        const _PlaceholderTab(
+          icon: Icons.folder_shared_outlined,
+          title: 'Medical Record',
+          description: 'Sign in again to load your medical records.',
+        ),
+      if (session != null)
+        BillingTab(
+          key: _billingKey,
+          session: session,
+        )
+      else
+        const _PlaceholderTab(
+          icon: Icons.receipt_long_outlined,
+          title: 'Billing',
+          description: 'Sign in again to see your bills and payments.',
+        ),
+      if (session != null)
+        ProfileTab(
+          session: session,
+          onProfileUpdated: () => _homeKey.currentState?.refresh(),
+        )
+      else
+        const _PlaceholderTab(
+          icon: Icons.person_outline,
+          title: 'Profile',
+          description: 'Sign in again to view your profile.',
+        ),
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_titles[_index]),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: false,
+      backgroundColor: AppleColors.canvas,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: AppBar(
+              title: Text(
+                _titles[_index],
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.5,
+                  color: AppleColors.textPrimary,
+                ),
+              ),
+              backgroundColor: Colors.white.withValues(alpha: 0.85),
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              centerTitle: false,
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(0.8),
+                child: Container(
+                  color: AppleColors.border.withValues(alpha: 0.6),
+                  height: 0.8,
+                ),
+              ),
+              actions: [
+                if (_index == 0 && session != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: AppleTapBounce(
+                      onTap: () => _homeKey.currentState?.refresh(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppleColors.canvas,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppleColors.border,
+                            width: 0.8,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.refresh_rounded,
+                          size: 19,
+                          color: AppleColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_index == 1 && session != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: AppleTapBounce(
+                      onTap: () => _appointmentsKey.currentState?.refresh(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppleColors.canvas,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppleColors.border,
+                            width: 0.8,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.refresh_rounded,
+                          size: 19,
+                          color: AppleColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_index == 3 && session != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: AppleTapBounce(
+                      onTap: () => _billingKey.currentState?.refresh(),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppleColors.canvas,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppleColors.border,
+                            width: 0.8,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.refresh_rounded,
+                          size: 19,
+                          color: AppleColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          ),
+        ),
       ),
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SafeArea(child: pages[_index]),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.folder_shared_outlined),
-            selectedIcon: Icon(Icons.folder_shared),
-            label: 'Medical Record',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long),
-            label: 'Billing',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
+      body: SafeArea(
+        child: IndexedStack(
+          index: _index,
+          children: pages,
+        ),
+      ),
+      bottomNavigationBar: _AppleBottomNavBar(
+        currentIndex: _index,
+        onTap: _selectTab,
+      ),
+    );
+  }
+}
+
+class _AppleBottomNavBar extends StatelessWidget {
+  const _AppleBottomNavBar({
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.90),
+        border: const Border(
+          top: BorderSide(color: AppleColors.hairline, width: 0.8),
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 16,
+            offset: Offset(0, -4),
           ),
         ],
       ),
-    );
-  }
-}
-
-class _HomeTab extends StatelessWidget {
-  const _HomeTab({this.userName});
-
-  final String? userName;
-
-  @override
-  Widget build(BuildContext context) {
-    final name = (userName != null && userName!.trim().isNotEmpty)
-        ? userName!.trim()
-        : 'Patient';
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(
-          'Welcome, $name',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Patient portal access',
-          style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
-        ),
-        const SizedBox(height: 20),
-        _InfoCard(
-          icon: Icons.calendar_today_outlined,
-          color: const Color(0xFF2196F3),
-          title: 'Appointments',
-          subtitle: 'View and manage your upcoming visits.',
-        ),
-        const SizedBox(height: 12),
-        _InfoCard(
-          icon: Icons.folder_shared_outlined,
-          color: const Color(0xFF0EA5E9),
-          title: 'Medical Records',
-          subtitle: 'Access your reports and prescriptions.',
-        ),
-        const SizedBox(height: 12),
-        _InfoCard(
-          icon: Icons.receipt_long_outlined,
-          color: const Color(0xFF14B8A6),
-          title: 'Billing',
-          subtitle: 'Check invoices and payment history.',
-        ),
-      ],
-    );
-  }
-}
-
-class _ProfileTab extends StatelessWidget {
-  const _ProfileTab({this.userName, this.email});
-
-  final String? userName;
-  final String? email;
-
-  @override
-  Widget build(BuildContext context) {
-    final displayName = (userName != null && userName!.trim().isNotEmpty)
-        ? userName!.trim()
-        : 'Patient';
-    final displayEmail = (email != null && email!.trim().isNotEmpty)
-        ? email!.trim()
-        : 'Not available';
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Center(
-          child: CircleAvatar(
-            radius: 36,
-            backgroundColor: const Color(0xFFDBEAFE),
-            child: Text(
-              displayName.isNotEmpty ? displayName[0].toUpperCase() : 'P',
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1D4ED8),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 60,
+              child: Row(
+                children: [
+                  _NavBarItem(
+                    index: 0,
+                    currentIndex: currentIndex,
+                    label: 'Home',
+                    activeIcon: Icons.home_rounded,
+                    inactiveIcon: Icons.home_outlined,
+                    onTap: onTap,
+                  ),
+                  _NavBarItem(
+                    index: 1,
+                    currentIndex: currentIndex,
+                    label: 'Appointments',
+                    activeIcon: Icons.calendar_month_rounded,
+                    inactiveIcon: Icons.calendar_month_outlined,
+                    onTap: onTap,
+                  ),
+                  _NavBarItem(
+                    index: 2,
+                    currentIndex: currentIndex,
+                    label: 'Records',
+                    activeIcon: Icons.folder_shared_rounded,
+                    inactiveIcon: Icons.folder_shared_outlined,
+                    onTap: onTap,
+                  ),
+                  _NavBarItem(
+                    index: 3,
+                    currentIndex: currentIndex,
+                    label: 'Billing',
+                    activeIcon: Icons.receipt_long_rounded,
+                    inactiveIcon: Icons.receipt_long_outlined,
+                    onTap: onTap,
+                  ),
+                  _NavBarItem(
+                    index: 4,
+                    currentIndex: currentIndex,
+                    label: 'Profile',
+                    activeIcon: Icons.person_rounded,
+                    inactiveIcon: Icons.person_outline,
+                    onTap: onTap,
+                  ),
+                ],
               ),
             ),
           ),
         ),
-        const SizedBox(height: 16),
-        Center(
-          child: Text(
-            displayName,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
+      ),
+    );
+  }
+}
+
+class _NavBarItem extends StatelessWidget {
+  const _NavBarItem({
+    required this.index,
+    required this.currentIndex,
+    required this.label,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.onTap,
+  });
+
+  final int index;
+  final int currentIndex;
+  final String label;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = index == currentIndex;
+
+    return Expanded(
+      child: AppleTapBounce(
+        onTap: () => onTap(index),
+        shrinkScale: 0.94,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedScale(
+              scale: isSelected ? 1.08 : 1.0,
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              child: Icon(
+                isSelected ? activeIcon : inactiveIcon,
+                size: 24,
+                color: isSelected ? AppleColors.blue : AppleColors.textTertiary,
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Center(
-          child: Text(
-            displayEmail,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF475569)),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Card(
-          elevation: 0,
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: Color(0xFFE2E8F0)),
-          ),
-          child: Column(
-            children: [
-              const ListTile(
-                leading: Icon(Icons.badge_outlined),
-                title: Text('Account type'),
-                subtitle: Text('Patient'),
+            const SizedBox(height: 3),
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              style: TextStyle(
+                fontSize: 10.5,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppleColors.blue : AppleColors.textTertiary,
+                letterSpacing: -0.2,
               ),
-              const Divider(height: 1),
-              ListTile(
-                leading: const Icon(Icons.logout),
-                title: const Text('Log out'),
-                onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute<void>(builder: (_) => const LoginPage()),
-                    (route) => false,
-                  );
-                },
-              ),
-            ],
-          ),
+              child: Text(label),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -232,58 +383,36 @@ class _PlaceholderTab extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 56, color: const Color(0xFF2196F3)),
-            const SizedBox(height: 16),
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: AppleColors.blueLight,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Icon(icon, size: 40, color: AppleColors.blue),
+            ),
+            const SizedBox(height: 18),
             Text(
               title,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Colors.black,
+                color: AppleColors.textPrimary,
+                letterSpacing: -0.4,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               description,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF475569)),
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppleColors.textSecondary,
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _InfoCard extends StatelessWidget {
-  const _InfoCard({
-    required this.icon,
-    required this.color,
-    required this.title,
-    required this.subtitle,
-  });
-
-  final IconData icon;
-  final Color color;
-  final String title;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.12),
-          child: Icon(icon, color: color),
-        ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle),
       ),
     );
   }

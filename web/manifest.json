@@ -1,11 +1,11 @@
 {
-    "name": "my_patines",
-    "short_name": "my_patines",
+    "name": "My Clinic - Patient Portal",
+    "short_name": "My Clinic",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8FAFC",
+    "theme_color": "#2196F3",
+    "description": "Patient portal for My Clinic.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

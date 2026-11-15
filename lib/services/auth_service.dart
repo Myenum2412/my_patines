@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -29,6 +30,46 @@ class AuthService {
     required String email,
     required String password,
   }) async {
+    final result = await _postJson(
+      AppConfig.loginUri,
+      {
+        'email': email.trim(),
+        'password': password,
+      },
+      successMessage: 'Login successful.',
+      failureMessage: 'Login failed. Please try again.',
+    );
+    if (!result.success) return result;
+
+    return AuthResult(
+      success: true,
+      message: result.message,
+      token: _extractToken(result.data),
+      data: result.data,
+      statusCode: result.statusCode,
+    );
+  }
+
+  /// Asks the clinic to email a single-use password reset link.
+  ///
+  /// The server always returns a generic success message so the response
+  /// cannot be used to discover which accounts exist.
+  Future<AuthResult> requestPasswordReset({required String identifier}) {
+    return _postJson(
+      AppConfig.forgotPasswordUri,
+      {'identifier': identifier.trim()},
+      successMessage:
+          "If an account exists for those details, we've sent a password reset link to the email on file.",
+      failureMessage: 'Could not send the reset link. Please try again.',
+    );
+  }
+
+  Future<AuthResult> _postJson(
+    Uri uri,
+    Map<String, dynamic> payload, {
+    required String successMessage,
+    required String failureMessage,
+  }) async {
     final httpClient = client ?? http.Client();
     final ownClient = client == null;
     try {
@@ -41,14 +82,13 @@ class AuthService {
         headers['Authorization'] = 'Bearer ${AppConfig.apiKey}';
       }
 
-      final response = await httpClient.post(
-        AppConfig.loginUri,
-        headers: headers,
-        body: jsonEncode({
-          'email': email.trim(),
-          'password': password,
-        }),
-      );
+      final response = await httpClient
+          .post(
+            uri,
+            headers: headers,
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 30));
 
       Map<String, dynamic>? body;
       try {
@@ -61,20 +101,33 @@ class AuthService {
       }
 
       final ok = response.statusCode >= 200 && response.statusCode < 300;
-      final token = _extractToken(body);
-      final message = _extractMessage(body, response.body, ok);
-
       return AuthResult(
         success: ok,
-        message: message,
-        token: token,
+        message: _extractMessage(
+          body,
+          response.body,
+          ok,
+          successMessage: successMessage,
+          failureMessage: failureMessage,
+        ),
         data: body,
         statusCode: response.statusCode,
+      );
+    } on TimeoutException {
+      return const AuthResult(
+        success: false,
+        message:
+            'The server took too long to respond. Please check your connection and try again.',
+      );
+    } on http.ClientException catch (e) {
+      return AuthResult(
+        success: false,
+        message: _connectionErrorMessage(e.toString()),
       );
     } catch (e) {
       return AuthResult(
         success: false,
-        message: 'Unable to connect. Please check your network and try again.',
+        message: _connectionErrorMessage(e.toString()),
       );
     } finally {
       if (ownClient) {
@@ -96,7 +149,41 @@ class AuthService {
     return null;
   }
 
-  String _extractMessage(Map<String, dynamic>? body, String raw, bool ok) {
+  String _connectionErrorMessage(String raw) {
+    final text = raw.toLowerCase();
+    if (text.contains('handshakeexception') ||
+        text.contains('certificate') ||
+        text.contains('tls') ||
+        text.contains('ssl') ||
+        text.contains('cert_')) {
+      return 'Secure connection to the clinic server failed. Please try again later.';
+    }
+    if (text.contains('failed host lookup') ||
+        text.contains('network is unreachable') ||
+        text.contains('no address associated with hostname') ||
+        text.contains('nodename nor servname provided')) {
+      return 'Could not reach the clinic server. Please check your internet connection and try again.';
+    }
+    if (text.contains('socketexception') ||
+        text.contains('connection refused') ||
+        text.contains('connection timed out') ||
+        text.contains('timed out') ||
+        text.contains('software caused connection abort') ||
+        text.contains('connection reset') ||
+        text.contains('connection closed') ||
+        text.contains('broken pipe')) {
+      return 'Could not reach the clinic server. Please check your connection and try again.';
+    }
+    return 'Could not connect to the clinic server. Please try again.';
+  }
+
+  String _extractMessage(
+    Map<String, dynamic>? body,
+    String raw,
+    bool ok, {
+    required String successMessage,
+    required String failureMessage,
+  }) {
     if (body != null) {
       for (final key in ['message', 'error', 'detail', 'msg']) {
         final value = body[key];
@@ -116,6 +203,6 @@ class AuthService {
     if (trimmed.isNotEmpty && trimmed.length < 200 && !trimmed.startsWith('{')) {
       return trimmed;
     }
-    return ok ? 'Login successful.' : 'Login failed. Please try again.';
+    return ok ? successMessage : failureMessage;
   }
 }
