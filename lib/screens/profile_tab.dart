@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../main.dart' show LoginPage;
-import '../models/patient_session.dart';
+import '../models/patient_session.dart'; // includes SessionStorage
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
 import '../widgets/apple_ui.dart';
@@ -365,6 +365,8 @@ class _ProfileTabState extends State<ProfileTab>
       },
     );
     if (confirmed != true || !mounted) return;
+    await SessionStorage.clear();
+    if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(builder: (_) => const LoginPage()),
       (route) => false,

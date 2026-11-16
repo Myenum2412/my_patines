@@ -42,7 +42,48 @@ class MyPatinesApp extends StatelessWidget {
         dividerColor: AppleColors.border,
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const AuthGate(),
+    );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    final session = await SessionStorage.load();
+    if (!mounted) return;
+    if (session != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute<void>(
+          builder: (_) => PatientHomePage(session: session),
+        ),
+      );
+      return;
+    }
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: AppleColors.canvas,
+      body: Center(
+        child: CircularProgressIndicator(color: AppleColors.blue),
+      ),
     );
   }
 }
@@ -125,6 +166,9 @@ class _LoginPageState extends State<LoginPage> {
             _stringAt(result.data ?? const {}, const ['clinic', 'name']),
       );
 
+      await SessionStorage.save(session);
+
+      if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute<void>(
           builder: (_) => PatientHomePage(session: session),

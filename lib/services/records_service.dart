@@ -201,7 +201,7 @@ class RecordsService {
       rethrow;
     } on TimeoutException {
       throw const RecordsException(
-        'Could not reach the clinic server. Please check your connection and try again.',
+        'Request timed out. The server is taking too long to respond. Please try again in a moment.',
       );
     } catch (err) {
       final text = err.toString().toLowerCase();
@@ -234,7 +234,7 @@ class RecordsService {
       rethrow;
     } on TimeoutException {
       throw const RecordsException(
-        'Could not reach the clinic server. Please check your connection and try again.',
+        'Request timed out. The server is taking too long to respond. Please try again in a moment.',
       );
     } catch (err) {
       final text = err.toString().toLowerCase();
@@ -264,7 +264,7 @@ class RecordsService {
               'Authorization': 'Bearer ${session.token}',
             },
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 60));
     } on TimeoutException {
       rethrow;
     } catch (err) {

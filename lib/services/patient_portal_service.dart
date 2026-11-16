@@ -877,7 +877,7 @@ class PatientPortalService {
   final http.Client _client;
   final bool _ownsClient;
 
-  static const _timeout = Duration(seconds: 30);
+  static const _timeout = Duration(seconds: 60);
 
 
   void dispose() {
@@ -1030,6 +1030,7 @@ class PatientPortalService {
     String method,
     String path, {
     Map<String, dynamic>? payload,
+    int attempt = 0,
   }) async {
     final uri = Uri.parse('${AppConfig.backendUrl}$path');
     final headers = <String, String>{
@@ -1066,8 +1067,12 @@ class PatientPortalService {
       final message = _extractMessage(body, response.body, status);
       throw PortalException(message, statusCode: status);
     } on TimeoutException {
+      if (method == 'GET' && attempt < 1) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        return _requestJson(method, path, payload: payload, attempt: attempt + 1);
+      }
       throw const PortalException(
-        'Request timed out. Please check your connection and try again.',
+        'Request timed out. The server is taking too long to respond. Please try again in a moment.',
       );
     } on http.ClientException catch (error) {
       final text = error.message.toLowerCase();
@@ -1078,6 +1083,10 @@ class PatientPortalService {
           text.contains('connection closed') ||
           text.contains('connection reset') ||
           text.contains('timed out');
+      if (method == 'GET' && looksLikeNetwork && attempt < 1) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        return _requestJson(method, path, payload: payload, attempt: attempt + 1);
+      }
       throw PortalException(
         looksLikeNetwork
             ? 'Could not reach the clinic server. Please check your connection and try again.'
@@ -1090,7 +1099,12 @@ class PatientPortalService {
           text.contains('failed host lookup') ||
           text.contains('network is unreachable') ||
           text.contains('connection refused') ||
-          text.contains('connection reset');
+          text.contains('connection reset') ||
+          text.contains('timed out');
+      if (method == 'GET' && looksLikeNetwork && attempt < 1) {
+        await Future<void>.delayed(const Duration(seconds: 2));
+        return _requestJson(method, path, payload: payload, attempt: attempt + 1);
+      }
       throw PortalException(
         looksLikeNetwork
             ? 'Could not reach the clinic server. Please check your connection and try again.'

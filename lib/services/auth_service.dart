@@ -88,7 +88,7 @@ class AuthService {
             headers: headers,
             body: jsonEncode(payload),
           )
-          .timeout(const Duration(seconds: 30));
+          .timeout(const Duration(seconds: 45));
 
       Map<String, dynamic>? body;
       try {

@@ -1,10 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_patines/main.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
   testWidgets('MyPatines login page renders without Google auth', (WidgetTester tester) async {
     await tester.pumpWidget(const MyPatinesApp());
+    await tester.pumpAndSettle();
 
     expect(find.text('Welcome to My Clinic'), findsOneWidget);
     expect(find.text('Email id'), findsOneWidget);
@@ -19,6 +24,7 @@ void main() {
 
   testWidgets('Forgot password opens the reset request page', (WidgetTester tester) async {
     await tester.pumpWidget(const MyPatinesApp());
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Forgot password?'));
     await tester.pumpAndSettle();
