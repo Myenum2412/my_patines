@@ -49,6 +49,20 @@ Then run the app:
 flutter run
 ```
 
+## Firebase Admin (Node.js, example)
+
+```js
+var admin = require("firebase-admin");
+
+var serviceAccount = require("path/to/serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+```
+
+> Keep `serviceAccountKey.json` secret; do not commit it.
+
 ## Test
 
 ```bash
