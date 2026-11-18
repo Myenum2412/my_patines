@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_animations.dart';
+
 /// A consistently styled, robust and responsive popup sheet or dialog used
 /// for record, appointment, prescription and invoice details.
 ///
@@ -17,6 +19,14 @@ Future<void> showDetailsSheet({
   Widget? footer,
 }) {
   final mediaQuery = MediaQuery.of(context);
+  final revealedChildren = <Widget>[
+    for (final (index, child) in children.indexed)
+      FadeSlideIn(
+        delay: Duration(milliseconds: 80 + 55 * index.clamp(0, 6)),
+        offset: const Offset(0, 12),
+        child: child,
+      ),
+  ];
   final isWide = mediaQuery.size.width >= 640;
 
   if (isWide) {
@@ -64,7 +74,7 @@ Future<void> showDetailsSheet({
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: children,
+                        children: revealedChildren,
                       ),
                     ),
                   ),
@@ -125,7 +135,7 @@ Future<void> showDetailsSheet({
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: children,
+                  children: revealedChildren,
                 ),
               ),
             ),

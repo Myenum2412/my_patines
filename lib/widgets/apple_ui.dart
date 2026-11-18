@@ -365,34 +365,46 @@ class AppleButton extends StatelessWidget {
               : null,
         ),
         alignment: Alignment.center,
-        child: isLoading
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.2,
-                  valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 18, color: foregroundColor),
-                    const SizedBox(width: 8),
-                  ],
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: foregroundColor,
-                      letterSpacing: -0.2,
-                    ),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.8, end: 1).animate(animation),
+              child: child,
+            ),
+          ),
+          child: isLoading
+              ? SizedBox(
+                  key: const ValueKey('loading'),
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.2,
+                    valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
                   ),
-                ],
-              ),
+                )
+              : Row(
+                  key: const ValueKey('label'),
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (icon != null) ...[
+                      Icon(icon, size: 18, color: foregroundColor),
+                      const SizedBox(width: 8),
+                    ],
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: foregroundColor,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

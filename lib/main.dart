@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
@@ -6,6 +7,7 @@ import 'models/patient_session.dart';
 import 'screens/forgot_password_page.dart';
 import 'screens/patient_home_page.dart';
 import 'services/auth_service.dart';
+import 'widgets/app_animations.dart';
 import 'widgets/apple_ui.dart';
 
 Future<void> main() async {
@@ -41,6 +43,12 @@ class MyPatinesApp extends StatelessWidget {
         ),
         dividerColor: AppleColors.border,
         useMaterial3: true,
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: FadeRisePageTransitionsBuilder(),
+            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          },
+        ),
       ),
       home: const AuthGate(),
     );
@@ -54,35 +62,96 @@ class AuthGate extends StatefulWidget {
   State<AuthGate> createState() => _AuthGateState();
 }
 
-class _AuthGateState extends State<AuthGate> {
+class _AuthGateState extends State<AuthGate>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  );
+  late final Animation<double> _logoScale = CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0, 0.6, curve: Curves.easeOutBack),
+  );
+  late final Animation<double> _logoFade = CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0, 0.35, curve: Curves.easeOut),
+  );
+  late final Animation<double> _ring = CurvedAnimation(
+    parent: _controller,
+    curve: const Interval(0.25, 1, curve: Curves.easeOutCubic),
+  );
+  bool _started = false;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
     _bootstrap();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   Future<void> _bootstrap() async {
-    final session = await SessionStorage.load();
+    final results = await Future.wait<Object?>([
+      SessionStorage.load(),
+      if (!reduceMotionOf(context)) _controller.forward(),
+    ]);
+    final session = results.first as PatientSession?;
     if (!mounted) return;
-    if (session != null) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(
-          builder: (_) => PatientHomePage(session: session),
-        ),
-      );
-      return;
-    }
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const LoginPage()),
+      fadeRoute<void>(
+        (_) => session != null
+            ? PatientHomePage(session: session)
+            : const LoginPage(),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: AppleColors.canvas,
       body: Center(
-        child: CircularProgressIndicator(color: AppleColors.blue),
+        child: SizedBox.square(
+          dimension: 240,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              AnimatedBuilder(
+                animation: _ring,
+                builder: (context, _) => Container(
+                  width: 96 + 144 * _ring.value,
+                  height: 96 + 144 * _ring.value,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      width: 2,
+                      color: AppleColors.blue.withValues(
+                        alpha: 0.35 * (1 - _ring.value),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              FadeTransition(
+                opacity: _logoFade,
+                child: ScaleTransition(
+                  scale: _logoScale,
+                  child: Image.asset(
+                    'assets/images/logo-mark.png',
+                    width: 150,
+                    height: 150,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -97,6 +166,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+  final _shakeKey = GlobalKey<ShakeOnErrorState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = const AuthService();
@@ -112,7 +182,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit() async {
     if (_isLoading) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      _shakeKey.currentState?.shake();
+      return;
+    }
 
     setState(() => _isLoading = true);
     final result = await _authService.login(
@@ -127,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (result.success) {
       if (!_isPatient(result.data)) {
+        _shakeKey.currentState?.shake();
         messenger.showSnackBar(
           const SnackBar(
             content: Text('Access denied. This app is for patients only.'),
@@ -143,6 +217,7 @@ class _LoginPageState extends State<LoginPage> {
           _stringAt(result.data ?? const {}, const ['clinic', 'clinicId']) ??
           _stringAt(result.data ?? const {}, const ['data', 'clinicId']);
       if (token == null || clinicId == null) {
+        _shakeKey.currentState?.shake();
         messenger.showSnackBar(
           const SnackBar(
             content: Text(
@@ -170,14 +245,13 @@ class _LoginPageState extends State<LoginPage> {
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute<void>(
-          builder: (_) => PatientHomePage(session: session),
-        ),
+        fadeRoute<void>((_) => PatientHomePage(session: session)),
         (route) => false,
       );
       return;
     }
 
+    _shakeKey.currentState?.shake();
     messenger.showSnackBar(
       SnackBar(
         content: Text(result.message ?? 'Login failed.'),
@@ -280,7 +354,14 @@ class _LoginPageState extends State<LoginPage> {
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 420),
-                        child: _buildAppleCard(context),
+                        child: FadeSlideIn(
+                          offset: const Offset(0, 28),
+                          duration: const Duration(milliseconds: 560),
+                          child: ShakeOnError(
+                            key: _shakeKey,
+                            child: _buildAppleCard(context),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -308,34 +389,43 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Center(
-              child: Image.asset(
-                'assets/images/logo-wordmark.png',
-                height: 56,
-                fit: BoxFit.contain,
+            _staggered(
+              1,
+              Center(
+                child: Image.asset(
+                  'assets/images/logo-wordmark.png',
+                  height: 56,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
             const SizedBox(height: 22),
-            const Text(
-              'Welcome to My Clinic',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
-                color: AppleColors.textPrimary,
-                letterSpacing: -0.6,
-                height: 1.2,
+            _staggered(
+              2,
+              const Text(
+                'Welcome to My Clinic',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppleColors.textPrimary,
+                  letterSpacing: -0.6,
+                  height: 1.2,
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Sign in to view your appointments, reports and bills.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                height: 1.4,
-                color: AppleColors.textSecondary,
-                letterSpacing: -0.1,
+            _staggered(
+              3,
+              const Text(
+                'Sign in to view your appointments, reports and bills.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.4,
+                  color: AppleColors.textSecondary,
+                  letterSpacing: -0.1,
+                ),
               ),
             ),
             const SizedBox(height: 28),
@@ -431,12 +521,15 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
             const SizedBox(height: 24),
-            AppleButton(
-              label: 'Login',
-              onPressed: _isLoading ? null : _submit,
-              isLoading: _isLoading,
-              height: 50,
-              borderRadius: 14,
+            _staggered(
+              4,
+              AppleButton(
+                label: 'Login',
+                onPressed: _isLoading ? null : _submit,
+                isLoading: _isLoading,
+                height: 50,
+                borderRadius: 14,
+              ),
             ),
             const SizedBox(height: 24),
             const Text.rich(
@@ -471,6 +564,14 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _staggered(int step, Widget child) {
+    return FadeSlideIn(
+      delay: Duration(milliseconds: 90 * step),
+      offset: const Offset(0, 10),
+      child: child,
     );
   }
 

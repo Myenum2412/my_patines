@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/patient_session.dart';
 import '../services/records_service.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import '../widgets/details_sheet.dart';
 import 'file_viewer_page.dart';
@@ -69,9 +70,7 @@ class _MedicalRecordsTabState extends State<MedicalRecordsTab> {
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppleColors.blue),
-          );
+          return const SkeletonLoader();
         }
         if (snapshot.hasError) {
           final error = snapshot.error;
@@ -87,10 +86,12 @@ class _MedicalRecordsTabState extends State<MedicalRecordsTab> {
             onRetry: _reload,
           );
         }
-        return _RecordsBody(
-          data: data,
-          service: _service,
-          onRefresh: _refresh,
+        return FadeSlideIn(
+          child: _RecordsBody(
+            data: data,
+            service: _service,
+            onRefresh: _refresh,
+          ),
         );
       },
     );
@@ -279,7 +280,8 @@ class _TimelineViewState extends State<_TimelineView> {
       groups.putIfAbsent(_dayLabel(event.date), () => []).add(event);
     }
 
-    return RefreshIndicator(
+    var revealIndex = 0;
+    final content = RefreshIndicator(
       onRefresh: widget.onRefresh,
       color: const Color(0xFF2196F3),
       child: ListView(
@@ -340,84 +342,87 @@ class _TimelineViewState extends State<_TimelineView> {
             ),
             const SizedBox(height: 8),
             for (final event in group.value)
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SizedBox(
-                      width: 22,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              width: 2,
-                              color: const Color(0xFFE2E8F0),
-                            ),
-                          ),
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: event.isRecord
-                                  ? const Color(0xFF2196F3)
-                                  : const Color(0xFFF59E0B),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              width: 2,
-                              color: const Color(0xFFE2E8F0),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: event.isRecord
-                            ? _TimelineCard(
-                                icon: Icons.medical_information_outlined,
-                                iconColor: const Color(0xFF0284C7),
-                                iconBackground: const Color(0xFFE0F2FE),
-                                badge: 'Visit',
-                                title: _recordTitle(event.record!),
-                                subtitle: _recordSubtitle(event.record!),
-                                trailing: const Icon(
-                                  Icons.chevron_right,
-                                  color: Color(0xFF94A3B8),
-                                ),
-                                onTap: () =>
-                                    widget.onOpenRecord(event.record!),
-                              )
-                            : _TimelineCard(
-                                icon: _fileIcon(event.file!.mimeType),
-                                iconColor: _iconColor(event.file!.mimeType),
-                                iconBackground:
-                                    _iconBackground(event.file!.mimeType),
-                                badge: 'Document',
-                                title: event.file!.fileName,
-                                subtitle: _fileSubtitle(event.file!),
-                                trailing: widget.openingFileId ==
-                                        event.file!.fileId
-                                    ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.play_circle_outline_rounded,
-                                        color: Color(0xFF2196F3),
-                                      ),
-                                onTap: () => widget.onOpenFile(event.file!),
+              RevealItem(
+                index: revealIndex++,
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(
+                        width: 22,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                width: 2,
+                                color: const Color(0xFFE2E8F0),
                               ),
+                            ),
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: event.isRecord
+                                    ? const Color(0xFF2196F3)
+                                    : const Color(0xFFF59E0B),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                width: 2,
+                                color: const Color(0xFFE2E8F0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: event.isRecord
+                              ? _TimelineCard(
+                                  icon: Icons.medical_information_outlined,
+                                  iconColor: const Color(0xFF0284C7),
+                                  iconBackground: const Color(0xFFE0F2FE),
+                                  badge: 'Visit',
+                                  title: _recordTitle(event.record!),
+                                  subtitle: _recordSubtitle(event.record!),
+                                  trailing: const Icon(
+                                    Icons.chevron_right,
+                                    color: Color(0xFF94A3B8),
+                                  ),
+                                  onTap: () =>
+                                      widget.onOpenRecord(event.record!),
+                                )
+                              : _TimelineCard(
+                                  icon: _fileIcon(event.file!.mimeType),
+                                  iconColor: _iconColor(event.file!.mimeType),
+                                  iconBackground:
+                                      _iconBackground(event.file!.mimeType),
+                                  badge: 'Document',
+                                  title: event.file!.fileName,
+                                  subtitle: _fileSubtitle(event.file!),
+                                  trailing: widget.openingFileId ==
+                                          event.file!.fileId
+                                      ? const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                        )
+                                      : const Icon(
+                                          Icons.play_circle_outline_rounded,
+                                          color: Color(0xFF2196F3),
+                                        ),
+                                  onTap: () => widget.onOpenFile(event.file!),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             const SizedBox(height: 6),
@@ -432,6 +437,7 @@ class _TimelineViewState extends State<_TimelineView> {
         ],
       ),
     );
+    return RevealScope(replayKey: _filter, child: content);
   }
 }
 
@@ -527,7 +533,9 @@ class _FilterChip extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOutCubic,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF2196F3) : Colors.white,

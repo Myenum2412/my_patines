@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/patient_session.dart';
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import 'book_appointment_page.dart';
 
@@ -150,7 +151,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
   @override
   Widget build(BuildContext context) {
     if (_loading && _appointments == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonLoader();
     }
     if (_error != null && _appointments == null) {
       return _AppointmentsError(message: _error!, onRetry: _load);
@@ -209,7 +210,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
         _statusFilter != _AppointmentStatusFilter.all ||
         query.isNotEmpty;
 
-    return RefreshIndicator(
+    final content = RefreshIndicator(
       onRefresh: refresh,
       color: const Color(0xFF2196F3),
       child: ListView(
@@ -387,15 +388,24 @@ class AppointmentsTabState extends State<AppointmentsTab> {
               onBookAppointment: _openBooking,
             )
           else
-            for (final apt in list) ...[
-              _TokenCard(
-                appointment: apt,
-                isToday: _isToday(apt.date),
-                onTap: () => _showTokenDetailsModal(context, apt),
+            for (final (index, apt) in list.indexed) ...[
+              RevealItem(
+                index: index,
+                child: _TokenCard(
+                  appointment: apt,
+                  isToday: _isToday(apt.date),
+                  onTap: () => _showTokenDetailsModal(context, apt),
+                ),
               ),
               const SizedBox(height: 12),
             ],
         ],
+      ),
+    );
+    return FadeSlideIn(
+      child: RevealScope(
+        replayKey: (_dateScope, _statusFilter),
+        child: content,
       ),
     );
   }

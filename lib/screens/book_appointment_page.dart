@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/patient_session.dart';
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 
 /// Apple-styled appointment booking form where patients choose from verified
@@ -197,20 +198,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 68,
-                  height: 68,
-                  decoration: BoxDecoration(
-                    color: AppleColors.greenLight,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppleColors.green.withValues(alpha: 0.3), width: 1.5),
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    color: AppleColors.green,
-                    size: 38,
-                  ),
-                ),
+                const SuccessCheck(size: 76),
                 const SizedBox(height: 18),
                 const Text(
                   'Appointment Booked!',

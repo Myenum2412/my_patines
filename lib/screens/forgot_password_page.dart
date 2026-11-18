@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 
 /// Requests a password-reset link from the clinic.
@@ -138,7 +139,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     child: Center(
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 420),
-                        child: _buildAppleCard(),
+                        child: FadeSlideIn(
+                          offset: const Offset(0, 28),
+                          duration: const Duration(milliseconds: 560),
+                          child: _buildAppleCard(),
+                        ),
                       ),
                     ),
                   ),
@@ -160,7 +165,23 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         border: Border.all(color: AppleColors.border, width: 0.8),
         boxShadow: AppleColors.elevatedShadow,
       ),
-      child: _sent ? _buildSuccess() : _buildForm(),
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 320),
+        curve: Curves.easeOutCubic,
+        alignment: Alignment.topCenter,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 280),
+          layoutBuilder: (currentChild, previousChildren) => Stack(
+            fit: StackFit.passthrough,
+            alignment: Alignment.topCenter,
+            children: [...previousChildren, ?currentChild],
+          ),
+          child: KeyedSubtree(
+            key: ValueKey<bool>(_sent),
+            child: _sent ? _buildSuccess() : _buildForm(),
+          ),
+        ),
+      ),
     );
   }
 
@@ -288,21 +309,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Center(
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppleColors.greenLight,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Icon(
-              Icons.mark_email_read_rounded,
-              size: 32,
-              color: AppleColors.green,
-            ),
-          ),
-        ),
+        const Center(child: SuccessCheck(size: 76)),
         const SizedBox(height: 20),
         const Text(
           'Check your email',

@@ -6,6 +6,7 @@ import '../models/patient_session.dart';
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
 import '../utils/invoice_pdf_generator.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import '../widgets/details_sheet.dart';
 import 'invoice_pdf_preview_page.dart';
@@ -112,7 +113,7 @@ class BillingTabState extends State<BillingTab> {
   @override
   Widget build(BuildContext context) {
     if (_loading && _bills == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonLoader();
     }
     if (_error != null && _bills == null) {
       return _BillingError(message: _error!, onRetry: () => _load());
@@ -211,7 +212,7 @@ class BillingTabState extends State<BillingTab> {
         _sort != _BillSort.newest ||
         query.isNotEmpty;
 
-    return RefreshIndicator(
+    final content = RefreshIndicator(
       onRefresh: refresh,
       color: const Color(0xFF2196F3),
       child: ListView(
@@ -446,10 +447,13 @@ class BillingTabState extends State<BillingTab> {
               onShowAll: _resetFilters,
             )
           else
-            for (final bill in filtered) ...[
-              _BillCard(
-                bill: bill,
-                onTap: () => _showBillDetails(bill),
+            for (final (index, bill) in filtered.indexed) ...[
+              RevealItem(
+                index: index,
+                child: _BillCard(
+                  bill: bill,
+                  onTap: () => _showBillDetails(bill),
+                ),
               ),
               const SizedBox(height: 10),
             ],
@@ -461,6 +465,12 @@ class BillingTabState extends State<BillingTab> {
             ),
           ),
         ],
+      ),
+    );
+    return FadeSlideIn(
+      child: RevealScope(
+        replayKey: (_filter, _sort),
+        child: content,
       ),
     );
   }

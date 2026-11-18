@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/patient_session.dart';
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import '../widgets/avatar_picker_sheet.dart';
 import '../widgets/details_sheet.dart';
@@ -32,9 +33,26 @@ class HomeTab extends StatefulWidget {
   State<HomeTab> createState() => HomeTabState();
 }
 
-class HomeTabState extends State<HomeTab> {
+class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
+  late final AnimationController _reveal = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  );
+  late final Animation<double> _bookButtonScale = CurvedAnimation(
+    parent: _reveal,
+    curve: const Interval(0.55, 1, curve: Curves.easeOutBack),
+  );
+
   late final PatientPortalService _service;
   late final bool _ownsService;
+  late final Animation<double> _bannerShine = CurvedAnimation(
+    parent: _reveal,
+    curve: const Interval(0.4, 1, curve: Curves.easeInOut),
+  );
+  late final Animation<double> _statCount = CurvedAnimation(
+    parent: _reveal,
+    curve: const Interval(0.15, 1, curve: Curves.easeOutCubic),
+  );
 
   PortalDashboardData? _data;
   List<DoctorEntry> _doctors = const <DoctorEntry>[];
@@ -51,6 +69,7 @@ class HomeTabState extends State<HomeTab> {
 
   @override
   void dispose() {
+    _reveal.dispose();
     if (_ownsService) _service.dispose();
     super.dispose();
   }
@@ -77,6 +96,11 @@ class HomeTabState extends State<HomeTab> {
         _error = null;
         _loading = false;
       });
+      if (reduceMotionOf(context)) {
+        _reveal.value = 1;
+      } else {
+        _reveal.forward();
+      }
     } on PortalException catch (error) {
       if (!mounted) return;
       if (_data == null) {
@@ -112,7 +136,7 @@ class HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     if (_loading && _data == null) {
-      return const Center(child: CircularProgressIndicator(color: AppleColors.blue));
+      return const SkeletonLoader();
     }
     if (_error != null && _data == null) {
       return _DashboardError(message: _error!, onRetry: () => _load());
@@ -134,7 +158,7 @@ class HomeTabState extends State<HomeTab> {
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 92),
-            children: [
+            children: _staggered([
               _WelcomeCard(
                 firstName: firstNameOf(data.patient.fullName),
                 clinicName: widget.session.clinicName ?? '',
@@ -148,14 +172,18 @@ class HomeTabState extends State<HomeTab> {
               ),
               const SizedBox(height: 16),
               // PRIMARY HERO ACTION: BOOK APPOINTMENT
-              _BookAppointmentHeroBanner(
-                onBookAppointment: _openBookAppointment,
-                onOpenDoctors: _openDoctorsSheet,
+              ShineSweep(
+                animation: _bannerShine,
+                child: _BookAppointmentHeroBanner(
+                  onBookAppointment: _openBookAppointment,
+                  onOpenDoctors: _openDoctorsSheet,
+                ),
               ),
               const SizedBox(height: 20),
               // CARE STATS GRID
               _StatsGrid(
                 data: data,
+                countProgress: _statCount,
                 onOpenAppointments: _showAppointmentsSheet,
                 onOpenPrescriptions: _showPrescriptionsSheet,
                 onOpenTab: widget.onOpenTab,
@@ -232,19 +260,39 @@ class HomeTabState extends State<HomeTab> {
                   style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
                 ),
               ),
-            ],
+            ]),
           ),
         ),
         // Floating Action Button for instant appointment booking
         Positioned(
           right: 16,
           bottom: 18,
-          child: _FloatingBookButton(
-            onTap: _openBookAppointment,
+          child: ScaleTransition(
+            scale: _bookButtonScale,
+            child: PulseRing(
+              child: _FloatingBookButton(
+                onTap: _openBookAppointment,
+              ),
+            ),
           ),
         ),
       ],
     );
+  }
+
+  List<Widget> _staggered(List<Widget> sections) {
+    var index = 0;
+    return [
+      for (final section in sections)
+        if (section is SizedBox)
+          section
+        else
+          StaggeredReveal(
+            animation: _reveal,
+            index: index++,
+            child: section,
+          ),
+    ];
   }
 
   void _openBookAppointment([DoctorEntry? doctor]) {
@@ -955,15 +1003,19 @@ class _BookAppointmentHeroBanner extends StatelessWidget {
   }
 }
 
+String _wholeNumber(double value) => '${value.round()}';
+
 class _StatsGrid extends StatelessWidget {
   const _StatsGrid({
     required this.data,
+    required this.countProgress,
     required this.onOpenAppointments,
     required this.onOpenPrescriptions,
     required this.onOpenTab,
   });
 
   final PortalDashboardData data;
+  final Animation<double> countProgress;
   final VoidCallback onOpenAppointments;
   final VoidCallback onOpenPrescriptions;
   final ValueChanged<int> onOpenTab;
@@ -983,7 +1035,9 @@ class _StatsGrid extends StatelessWidget {
                 icon: Icons.calendar_month_rounded,
                 iconColor: AppleColors.blue,
                 iconBackground: AppleColors.blueLight,
-                value: '${data.upcomingAppointments.length}',
+                countProgress: countProgress,
+                countTo: data.upcomingAppointments.length.toDouble(),
+                format: _wholeNumber,
                 label: 'Appointments',
                 subLabel: 'Upcoming visits',
                 onTap: () => onOpenTab(1),
@@ -995,7 +1049,9 @@ class _StatsGrid extends StatelessWidget {
                 icon: Icons.folder_shared_rounded,
                 iconColor: AppleColors.purple,
                 iconBackground: AppleColors.purpleLight,
-                value: '${data.documentsCount}',
+                countProgress: countProgress,
+                countTo: data.documentsCount.toDouble(),
+                format: _wholeNumber,
                 label: 'Medical Records',
                 subLabel: 'Health documents',
                 onTap: () => onOpenTab(2),
@@ -1007,7 +1063,9 @@ class _StatsGrid extends StatelessWidget {
                 icon: Icons.medication_rounded,
                 iconColor: AppleColors.teal,
                 iconBackground: AppleColors.tealLight,
-                value: '${data.prescriptions.length}',
+                countProgress: countProgress,
+                countTo: data.prescriptions.length.toDouble(),
+                format: _wholeNumber,
                 label: 'Prescriptions',
                 subLabel: 'Active medications',
                 onTap: onOpenPrescriptions,
@@ -1023,7 +1081,9 @@ class _StatsGrid extends StatelessWidget {
                 iconBackground: data.outstandingTotal > 0
                     ? AppleColors.orangeLight
                     : AppleColors.greenLight,
-                value: formatMoney(data.outstandingTotal),
+                countProgress: countProgress,
+                countTo: data.outstandingTotal,
+                format: formatMoney,
                 label: 'Bills & Invoices',
                 subLabel: data.outstandingTotal > 0
                     ? 'Outstanding'
@@ -1043,7 +1103,9 @@ class _StatCard extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.iconBackground,
-    required this.value,
+    required this.countProgress,
+    required this.countTo,
+    required this.format,
     required this.label,
     required this.subLabel,
     required this.onTap,
@@ -1052,7 +1114,9 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color iconColor;
   final Color iconBackground;
-  final String value;
+  final Animation<double> countProgress;
+  final double countTo;
+  final String Function(double) format;
   final String label;
   final String subLabel;
   final VoidCallback onTap;
@@ -1097,14 +1161,17 @@ class _StatCard extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.6,
-                    color: AppleColors.textPrimary,
-                    height: 1.1,
+                child: AnimatedBuilder(
+                  animation: countProgress,
+                  builder: (context, _) => Text(
+                    format(countTo * countProgress.value),
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.6,
+                      color: AppleColors.textPrimary,
+                      height: 1.1,
+                    ),
                   ),
                 ),
               ),

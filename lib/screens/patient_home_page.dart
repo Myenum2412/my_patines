@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import '../models/patient_session.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import 'appointments_tab.dart';
 import 'billing_tab.dart';
@@ -25,8 +26,20 @@ class PatientHomePage extends StatefulWidget {
   State<PatientHomePage> createState() => _PatientHomePageState();
 }
 
-class _PatientHomePageState extends State<PatientHomePage> {
+class _PatientHomePageState extends State<PatientHomePage>
+    with SingleTickerProviderStateMixin {
   int _index = 0;
+  double _slideDirection = 1;
+
+  late final AnimationController _tabController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 280),
+    value: 1,
+  );
+  late final Animation<double> _tabProgress = CurvedAnimation(
+    parent: _tabController,
+    curve: Curves.easeOutCubic,
+  );
 
   final GlobalKey<HomeTabState> _homeKey = GlobalKey<HomeTabState>();
   final GlobalKey<AppointmentsTabState> _appointmentsKey =
@@ -43,7 +56,17 @@ class _PatientHomePageState extends State<PatientHomePage> {
 
   void _selectTab(int index) {
     if (index < 0 || index > 4 || index == _index) return;
-    setState(() => _index = index);
+    setState(() {
+      _slideDirection = index > _index ? 1 : -1;
+      _index = index;
+    });
+    if (!reduceMotionOf(context)) _tabController.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -113,13 +136,33 @@ class _PatientHomePageState extends State<PatientHomePage> {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: AppBar(
-              title: Text(
-                _titles[_index],
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.5,
-                  color: AppleColors.textPrimary,
+              title: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 240),
+                switchInCurve: Curves.easeOutCubic,
+                switchOutCurve: Curves.easeInCubic,
+                layoutBuilder: (currentChild, previousChildren) => Stack(
+                  alignment: AlignmentDirectional.centerStart,
+                  children: [...previousChildren, ?currentChild],
+                ),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 0.35),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  ),
+                ),
+                child: Text(
+                  _titles[_index],
+                  key: ValueKey<int>(_index),
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.5,
+                    color: AppleColors.textPrimary,
+                  ),
                 ),
               ),
               backgroundColor: Colors.white.withValues(alpha: 0.85),
@@ -210,9 +253,19 @@ class _PatientHomePageState extends State<PatientHomePage> {
         ),
       ),
       body: SafeArea(
-        child: IndexedStack(
-          index: _index,
-          children: pages,
+        child: AnimatedBuilder(
+          animation: _tabProgress,
+          builder: (context, child) => Opacity(
+            opacity: _tabProgress.value,
+            child: Transform.translate(
+              offset: Offset(_slideDirection * 22 * (1 - _tabProgress.value), 0),
+              child: child,
+            ),
+          ),
+          child: IndexedStack(
+            index: _index,
+            children: pages,
+          ),
         ),
       ),
       bottomNavigationBar: _AppleBottomNavBar(
@@ -255,7 +308,30 @@ class _AppleBottomNavBar extends StatelessWidget {
             top: false,
             child: SizedBox(
               height: 60,
-              child: Row(
+              child: Stack(
+                children: [
+                  AnimatedAlign(
+                    alignment: AlignmentDirectional(-1 + currentIndex / 2, -1),
+                    duration: const Duration(milliseconds: 320),
+                    curve: Curves.easeOutBack,
+                    child: FractionallySizedBox(
+                      widthFactor: 0.2,
+                      child: Center(
+                        heightFactor: 1,
+                        child: Container(
+                          width: 28,
+                          height: 3,
+                          decoration: const BoxDecoration(
+                            color: AppleColors.blue,
+                            borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(3),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Row(
                 children: [
                   _NavBarItem(
                     index: 0,
@@ -299,6 +375,8 @@ class _AppleBottomNavBar extends StatelessWidget {
                   ),
                 ],
               ),
+                ],
+              ),
             ),
           ),
         ),
@@ -336,9 +414,9 @@ class _NavBarItem extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedScale(
-              scale: isSelected ? 1.08 : 1.0,
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOutCubic,
+              scale: isSelected ? 1.12 : 1.0,
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeOutBack,
               child: Icon(
                 isSelected ? activeIcon : inactiveIcon,
                 size: 24,

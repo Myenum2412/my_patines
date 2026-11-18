@@ -4,6 +4,7 @@ import '../main.dart' show LoginPage;
 import '../models/patient_session.dart'; // includes SessionStorage
 import '../services/patient_portal_service.dart';
 import '../utils/formatters.dart';
+import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import '../widgets/avatar_picker_sheet.dart';
 import '../widgets/patient_avatar_view.dart';
@@ -376,7 +377,7 @@ class _ProfileTabState extends State<ProfileTab>
   @override
   Widget build(BuildContext context) {
     if (_loading && _patient == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const SkeletonLoader(rows: 5);
     }
     if (_error != null && _patient == null) {
       return _ProfileError(message: _error!, onRetry: () => _load());
@@ -392,7 +393,7 @@ class _ProfileTabState extends State<ProfileTab>
 
     final values = _displayValues(patient);
 
-    return Column(
+    final content = Column(
       children: [
         _ProfileHeader(
           patient: patient,
@@ -450,6 +451,7 @@ class _ProfileTabState extends State<ProfileTab>
         ),
       ],
     );
+    return FadeSlideIn(child: content);
   }
 
   Widget _tabBody(List<Widget> sections) {
