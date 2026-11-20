@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+import 'app_animations.dart';
+
 /// Reusable Apple Design System colors, metrics, and micro-interaction widgets.
 /// Inspired by iOS 17/18, Apple Health, Apple Wallet, and Apple ID aesthetics.
 class AppleColors {
@@ -71,14 +73,15 @@ class AppleColors {
   ];
 }
 
-/// Tactile bounce micro-interaction that scales down on press and springs back on release.
+/// Press feedback: the target sinks 1px and scales to [shrinkScale] in 90ms,
+/// then eases back in 120ms. No spring, no overshoot.
 class AppleTapBounce extends StatefulWidget {
   const AppleTapBounce({
     super.key,
     required this.child,
     this.onTap,
     this.enabled = true,
-    this.shrinkScale = 0.965,
+    this.shrinkScale = 0.985,
     this.behavior = HitTestBehavior.opaque,
   });
 
@@ -95,25 +98,20 @@ class AppleTapBounce extends StatefulWidget {
 class _AppleTapBounceState extends State<AppleTapBounce>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
+  late final Animation<double> _progress;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 110),
-      reverseDuration: const Duration(milliseconds: 170),
+      duration: Motion.press,
+      reverseDuration: Motion.release,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: widget.shrinkScale,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeOutCubic,
-        reverseCurve: Curves.elasticOut,
-      ),
+    _progress = CurvedAnimation(
+      parent: _controller,
+      curve: Motion.ease,
+      reverseCurve: Motion.ease,
     );
   }
 
@@ -124,7 +122,7 @@ class _AppleTapBounceState extends State<AppleTapBounce>
   }
 
   void _handleTapDown(TapDownDetails _) {
-    if (widget.enabled && widget.onTap != null) {
+    if (widget.enabled && widget.onTap != null && !reduceMotionOf(context)) {
       _controller.forward();
     }
   }
@@ -153,11 +151,17 @@ class _AppleTapBounceState extends State<AppleTapBounce>
       onTapUp: _handleTapUp,
       onTapCancel: _handleTapCancel,
       child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) => Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        ),
+        animation: _progress,
+        builder: (context, child) {
+          final t = _progress.value;
+          return Transform.translate(
+            offset: Offset(0, t),
+            child: Transform.scale(
+              scale: 1 - (1 - widget.shrinkScale) * t,
+              child: child,
+            ),
+          );
+        },
         child: widget.child,
       ),
     );
@@ -199,10 +203,7 @@ class AppleCard extends StatelessWidget {
     );
 
     if (onTap != null) {
-      return AppleTapBounce(
-        onTap: onTap,
-        child: cardContent,
-      );
+      return AppleTapBounce(onTap: onTap, child: cardContent);
     }
     return cardContent;
   }

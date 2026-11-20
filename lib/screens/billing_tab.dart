@@ -826,41 +826,15 @@ class _BillingSummaryCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: settled
-              ? const [Color(0xFF064E3B), Color(0xFF047857), Color(0xFF065F46)]
-              : const [Color(0xFF1E293B), Color(0xFF0F172A), Color(0xFF1E1B4B)],
-        ),
+        color: settled ? const Color(0xFF0F5132) : const Color(0xFF1D1D1F),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.12),
           width: 0.8,
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 28,
-            offset: Offset(0, 12),
-          ),
-        ],
+        boxShadow: AppleColors.elevatedShadow,
       ),
       child: Stack(
         children: [
-          Positioned(
-            top: -40,
-            right: -24,
-            child: IgnorePointer(
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
-                ),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(
@@ -1034,13 +1008,9 @@ class _BillingSummaryCard extends StatelessWidget {
                               alignment: Alignment.centerLeft,
                               widthFactor: ratio,
                               child: Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: settled
-                                        ? const [Color(0xFF34D399), Color(0xFF10B981)]
-                                        : const [Color(0xFF38BDF8), Color(0xFF60A5FA)],
-                                  ),
-                                ),
+                                color: settled
+                                    ? const Color(0xFF34C759)
+                                    : const Color(0xFF64ACFF),
                               ),
                             ),
                           ),
@@ -1113,7 +1083,8 @@ class _BillFilterChip extends StatelessWidget {
     return AppleTapBounce(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: Motion.hoverIn,
+        curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? AppleColors.blue : Colors.white,
@@ -1122,15 +1093,6 @@ class _BillFilterChip extends StatelessWidget {
             color: selected ? AppleColors.blue : AppleColors.border,
             width: 0.8,
           ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: AppleColors.blue.withValues(alpha: 0.28),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

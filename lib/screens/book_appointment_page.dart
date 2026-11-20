@@ -446,11 +446,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF0071E3), Color(0xFF47A0FF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: AppleColors.blue,
               borderRadius: BorderRadius.circular(14),
             ),
             alignment: Alignment.center,
@@ -746,7 +742,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 child: AppleTapBounce(
                   onTap: () => setState(() => _visitType = type),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: Motion.hoverIn,
+                    curve: Motion.ease,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
                       color: isSelected ? AppleColors.textPrimary : Colors.white,
@@ -811,7 +808,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 child: AppleTapBounce(
                   onTap: () => setState(() => _selectedDate = d),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: Motion.hoverIn,
+                    curve: Motion.ease,
                     width: 58,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
@@ -930,7 +928,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     return AppleTapBounce(
       onTap: () => setState(() => _selectedTime = time),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: Motion.hoverIn,
+        curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
           color: isSelected ? AppleColors.blue : const Color(0xFFF8FAFC),
@@ -1022,7 +1021,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 child: AppleTapBounce(
                   onTap: () => setState(() => _priority = p),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
+                    duration: Motion.hoverIn,
+                    curve: Motion.ease,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: isSelected ? activeColor.withValues(alpha: 0.15) : const Color(0xFFF8FAFC),

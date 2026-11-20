@@ -534,8 +534,8 @@ class _FilterChip extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(999),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
-        curve: Curves.easeOutCubic,
+        duration: Motion.panel,
+        curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF2196F3) : Colors.white,
@@ -916,13 +916,6 @@ class _ErrorView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppleColors.blue,
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppleColors.blue.withValues(alpha: 0.28),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,

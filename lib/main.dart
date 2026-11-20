@@ -68,9 +68,14 @@ class _AuthGateState extends State<AuthGate>
     vsync: this,
     duration: const Duration(milliseconds: 1100),
   );
-  late final Animation<double> _logoScale = CurvedAnimation(
-    parent: _controller,
-    curve: const Interval(0, 0.6, curve: Curves.easeOutBack),
+  late final Animation<double> _logoScale = Tween<double>(
+    begin: 0.9,
+    end: 1,
+  ).animate(
+    CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0, 0.6, curve: Motion.easeEnter),
+    ),
   );
   late final Animation<double> _logoFade = CurvedAnimation(
     parent: _controller,
@@ -569,7 +574,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _staggered(int step, Widget child) {
     return FadeSlideIn(
-      delay: Duration(milliseconds: 90 * step),
+      delay: Duration(milliseconds: 60 * step),
       offset: const Offset(0, 10),
       child: child,
     );

@@ -22,8 +22,9 @@ Future<void> showDetailsSheet({
   final revealedChildren = <Widget>[
     for (final (index, child) in children.indexed)
       FadeSlideIn(
-        delay: Duration(milliseconds: 80 + 55 * index.clamp(0, 6)),
-        offset: const Offset(0, 12),
+        // The sheet's rows settle together as one block, never one by one.
+        delay: Duration(milliseconds: index == 0 ? 60 : 120),
+        offset: const Offset(0, 8),
         child: child,
       ),
   ];

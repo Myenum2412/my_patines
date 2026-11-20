@@ -38,20 +38,16 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
     vsync: this,
     duration: const Duration(milliseconds: 900),
   );
-  late final Animation<double> _bookButtonScale = CurvedAnimation(
+  late final Animation<double> _bookButtonIn = CurvedAnimation(
     parent: _reveal,
-    curve: const Interval(0.55, 1, curve: Curves.easeOutBack),
+    curve: const Interval(0.5, 1, curve: Motion.easeEnter),
   );
 
   late final PatientPortalService _service;
   late final bool _ownsService;
-  late final Animation<double> _bannerShine = CurvedAnimation(
-    parent: _reveal,
-    curve: const Interval(0.4, 1, curve: Curves.easeInOut),
-  );
   late final Animation<double> _statCount = CurvedAnimation(
     parent: _reveal,
-    curve: const Interval(0.15, 1, curve: Curves.easeOutCubic),
+    curve: const Interval(0.15, 1, curve: Motion.ease),
   );
 
   PortalDashboardData? _data;
@@ -172,12 +168,9 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               ),
               const SizedBox(height: 16),
               // PRIMARY HERO ACTION: BOOK APPOINTMENT
-              ShineSweep(
-                animation: _bannerShine,
-                child: _BookAppointmentHeroBanner(
-                  onBookAppointment: _openBookAppointment,
-                  onOpenDoctors: _openDoctorsSheet,
-                ),
+              _BookAppointmentHeroBanner(
+                onBookAppointment: _openBookAppointment,
+                onOpenDoctors: _openDoctorsSheet,
               ),
               const SizedBox(height: 20),
               // CARE STATS GRID
@@ -267,12 +260,11 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
         Positioned(
           right: 16,
           bottom: 18,
-          child: ScaleTransition(
-            scale: _bookButtonScale,
-            child: PulseRing(
-              child: _FloatingBookButton(
-                onTap: _openBookAppointment,
-              ),
+          child: FadeTransition(
+            opacity: _bookButtonIn,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.92, end: 1).animate(_bookButtonIn),
+              child: _FloatingBookButton(onTap: _openBookAppointment),
             ),
           ),
         ),
@@ -761,48 +753,14 @@ class _BookAppointmentHeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0071E3), Color(0xFF1D4ED8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppleColors.blue,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0071E3).withValues(alpha: 0.28),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        boxShadow: AppleColors.elevatedShadow,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Stack(
           children: [
-            Positioned(
-              right: -25,
-              top: -25,
-              child: Container(
-                width: 130,
-                height: 130,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.1),
-                ),
-              ),
-            ),
-            Positioned(
-              left: -30,
-              bottom: -35,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -1285,11 +1243,7 @@ class _NextAppointmentCard extends StatelessWidget {
                   width: 56,
                   padding: const EdgeInsets.symmetric(vertical: 9),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFE8F2FD), Color(0xFFD6E7FC)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+                    color: AppleColors.blueLight,
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: AppleColors.blue.withValues(alpha: 0.15)),
                   ),
@@ -1533,11 +1487,7 @@ class _DoctorMiniCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0071E3), Color(0xFF47A0FF)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppleColors.blue,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
@@ -1661,27 +1611,8 @@ class _FloatingBookButton extends StatelessWidget {
           height: 54,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF0071E3), Color(0xFF1B55B8)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF0071E3).withValues(alpha: 0.42),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.35),
-              width: 1.2,
-            ),
+            color: AppleColors.blue,
+            boxShadow: AppleColors.elevatedShadow,
           ),
           alignment: Alignment.center,
           child: const Icon(
@@ -2268,13 +2199,6 @@ class _SoftEmptyCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppleColors.blue,
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppleColors.blue.withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,

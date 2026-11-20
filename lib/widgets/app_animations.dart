@@ -4,6 +4,31 @@ import 'package:flutter/material.dart';
 
 import 'apple_ui.dart';
 
+/// One motion system for the whole app: every duration and curve lives here.
+///
+/// Quiet, fast UI steps; a single eased entrance for each screen's lead block;
+/// no bounce or overshoot anywhere.
+abstract final class Motion {
+  // Durations.
+  static const press = Duration(milliseconds: 90);
+  static const hoverIn = Duration(milliseconds: 150);
+  static const release = Duration(milliseconds: 120);
+  static const panel = Duration(milliseconds: 200);
+  static const slide = Duration(milliseconds: 240);
+  static const settle = Duration(milliseconds: 520);
+  static const enter = Duration(milliseconds: 700);
+  static const image = Duration(milliseconds: 600);
+
+  /// The one UI ease-out: every press, swap and state change.
+  static const Curve ease = Cubic(0.2, 0.8, 0.2, 1);
+
+  /// Entrances: the lead block of a screen arriving once.
+  static const Curve easeEnter = Cubic(0.22, 1, 0.36, 1);
+
+  /// Travel only: an indicator moving from one place to another.
+  static const Curve easeTravel = Cubic(0.65, 0, 0.35, 1);
+}
+
 /// Whether the user asked the OS to reduce motion.
 bool reduceMotionOf(BuildContext context) =>
     MediaQuery.maybeDisableAnimationsOf(context) ?? false;
@@ -14,8 +39,8 @@ class FadeSlideIn extends StatefulWidget {
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.duration = const Duration(milliseconds: 420),
-    this.offset = const Offset(0, 16),
+    this.duration = Motion.settle,
+    this.offset = const Offset(0, 10),
   });
 
   final Widget child;
@@ -41,7 +66,7 @@ class _FadeSlideInState extends State<FadeSlideIn>
     _interval = Interval(
       widget.delay.inMicroseconds / total.inMicroseconds,
       1,
-      curve: Curves.easeOutCubic,
+      curve: Motion.easeEnter,
     );
   }
 
@@ -77,10 +102,12 @@ class _FadeSlideInState extends State<FadeSlideIn>
   }
 }
 
-/// Reveals one item of a sequence from an animation owned by the parent.
+/// Reveals one item of a screen from an animation owned by the parent.
 ///
-/// Because the parent owns the progress, items rebuilt by a lazy list while
-/// scrolling stay visible instead of playing their entrance again.
+/// Only the lead block (index 0) makes an entrance: it rises 12px. Every item
+/// after it settles together as one block a beat later, so rows never cascade
+/// one by one. Because the parent owns the progress, items rebuilt by a lazy
+/// list while scrolling stay visible instead of playing their entrance again.
 class StaggeredReveal extends StatelessWidget {
   const StaggeredReveal({
     super.key,
@@ -93,15 +120,18 @@ class StaggeredReveal extends StatelessWidget {
   final int index;
   final Widget child;
 
+  static const _leadInterval = Interval(0, 0.7, curve: Motion.easeEnter);
+  static const _restInterval = Interval(0.2, 0.85, curve: Motion.easeEnter);
+
   @override
   Widget build(BuildContext context) {
-    final start = (index * 0.1).clamp(0.0, 0.5);
-    final interval = Interval(start, start + 0.5, curve: Curves.easeOutCubic);
+    final lead = index == 0;
+    final interval = lead ? _leadInterval : _restInterval;
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) => _reveal(
         interval.transform(animation.value),
-        const Offset(0, 18),
+        lead ? const Offset(0, 12) : const Offset(0, 6),
         child!,
       ),
       child: child,
@@ -119,11 +149,11 @@ Widget _reveal(double progress, Offset offset, Widget child) {
 /// Soft fade used when the app swaps its root screen.
 Route<T> fadeRoute<T>(WidgetBuilder builder) {
   return PageRouteBuilder<T>(
-    transitionDuration: const Duration(milliseconds: 380),
-    reverseTransitionDuration: const Duration(milliseconds: 240),
+    transitionDuration: Motion.settle,
+    reverseTransitionDuration: Motion.slide,
     pageBuilder: (context, _, _) => builder(context),
     transitionsBuilder: (context, animation, _, child) => FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+      opacity: CurvedAnimation(parent: animation, curve: Motion.ease),
       child: child,
     ),
   );
@@ -134,12 +164,15 @@ class FadeRisePageTransitionsBuilder extends PageTransitionsBuilder {
   const FadeRisePageTransitionsBuilder();
 
   static final _rise = Tween<Offset>(
-    begin: const Offset(0, 0.04),
+    begin: const Offset(0, 0.02),
     end: Offset.zero,
-  ).chain(CurveTween(curve: Curves.easeOutCubic));
+  ).chain(CurveTween(curve: Motion.easeEnter));
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 320);
+  Duration get transitionDuration => const Duration(milliseconds: 360);
+
+  @override
+  Duration get reverseTransitionDuration => Motion.slide;
 
   @override
   Widget buildTransitions<T>(
@@ -150,7 +183,7 @@ class FadeRisePageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     return FadeTransition(
-      opacity: animation.drive(CurveTween(curve: Curves.easeOut)),
+      opacity: animation.drive(CurveTween(curve: Motion.ease)),
       child: SlideTransition(position: animation.drive(_rise), child: child),
     );
   }
@@ -165,7 +198,9 @@ class RevealScope extends StatefulWidget {
   final Object? replayKey;
 
   static Animation<double> of(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_RevealInherited>()?.animation ??
+      context
+          .dependOnInheritedWidgetOfExactType<_RevealInherited>()
+          ?.animation ??
       kAlwaysCompleteAnimation;
 
   @override
@@ -176,7 +211,7 @@ class _RevealScopeState extends State<RevealScope>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 750),
+    duration: const Duration(milliseconds: 800),
   );
   bool _started = false;
 
@@ -232,10 +267,10 @@ class RevealItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => StaggeredReveal(
-        animation: RevealScope.of(context),
-        index: index,
-        child: child,
-      );
+    animation: RevealScope.of(context),
+    index: index,
+    child: child,
+  );
 }
 
 /// Shimmering placeholder shown while a screen loads its data.
@@ -344,135 +379,7 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
   }
 }
 
-/// A band of light that crosses [child] once, driven by [animation].
-class ShineSweep extends StatelessWidget {
-  const ShineSweep({
-    super.key,
-    required this.animation,
-    required this.child,
-    this.borderRadius = 24,
-  });
-
-  final Animation<double> animation;
-  final Widget child;
-  final double borderRadius;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.passthrough,
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: AnimatedBuilder(
-                animation: animation,
-                builder: (context, _) {
-                  final t = animation.value;
-                  if (t <= 0 || t >= 1) return const SizedBox.shrink();
-                  return FractionalTranslation(
-                    translation: Offset(-1 + 2 * t, 0),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: const Alignment(-0.7, -1),
-                          end: const Alignment(0.7, 1),
-                          colors: [
-                            Colors.white.withValues(alpha: 0),
-                            Colors.white.withValues(alpha: 0.26),
-                            Colors.white.withValues(alpha: 0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Sends a few soft rings out from a circular [child], then stops.
-class PulseRing extends StatefulWidget {
-  const PulseRing({
-    super.key,
-    required this.child,
-    this.color = AppleColors.blue,
-    this.pulses = 3,
-  });
-
-  final Widget child;
-  final Color color;
-  final int pulses;
-
-  @override
-  State<PulseRing> createState() => _PulseRingState();
-}
-
-class _PulseRingState extends State<PulseRing>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1500),
-  );
-  bool _started = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_started) return;
-    _started = true;
-    if (!reduceMotionOf(context)) _controller.repeat(count: widget.pulses);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: Alignment.center,
-      children: [
-        Positioned.fill(
-          child: IgnorePointer(
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                if (!_controller.isAnimating) return const SizedBox.shrink();
-                final t = Curves.easeOutCubic.transform(_controller.value);
-                return Transform.scale(
-                  scale: 1 + 0.7 * t,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        width: 2,
-                        color: widget.color.withValues(alpha: 0.45 * (1 - t)),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-        widget.child,
-      ],
-    );
-  }
-}
-
-/// Green circle that pops in while its tick draws itself.
+/// Green circle that settles in while its tick draws itself.
 class SuccessCheck extends StatefulWidget {
   const SuccessCheck({super.key, this.size = 68});
 
@@ -516,9 +423,8 @@ class _SuccessCheckState extends State<SuccessCheck>
         dimension: widget.size,
         child: AnimatedBuilder(
           animation: _controller,
-          builder: (context, _) => CustomPaint(
-            painter: _SuccessCheckPainter(_controller.value),
-          ),
+          builder: (context, _) =>
+              CustomPaint(painter: _SuccessCheckPainter(_controller.value)),
         ),
       ),
     );
@@ -531,8 +437,8 @@ class _SuccessCheckPainter extends CustomPainter {
   final double progress;
 
   static const _green = AppleColors.green;
-  static const _circle = Interval(0, 0.5, curve: Curves.easeOutBack);
-  static const _tick = Interval(0.35, 0.85, curve: Curves.easeOutCubic);
+  static const _circle = Interval(0, 0.5, curve: Motion.easeEnter);
+  static const _tick = Interval(0.35, 0.85, curve: Motion.ease);
   static const _burst = Interval(0.3, 1, curve: Curves.easeOut);
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/patient_session.dart';
 import '../widgets/app_animations.dart';
@@ -11,12 +12,7 @@ import 'medical_records_tab.dart';
 import 'profile_tab.dart';
 
 class PatientHomePage extends StatefulWidget {
-  const PatientHomePage({
-    super.key,
-    this.session,
-    this.userName,
-    this.email,
-  });
+  const PatientHomePage({super.key, this.session, this.userName, this.email});
 
   final PatientSession? session;
   final String? userName;
@@ -33,12 +29,12 @@ class _PatientHomePageState extends State<PatientHomePage>
 
   late final AnimationController _tabController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 280),
+    duration: Motion.panel,
     value: 1,
   );
   late final Animation<double> _tabProgress = CurvedAnimation(
     parent: _tabController,
-    curve: Curves.easeOutCubic,
+    curve: Motion.ease,
   );
 
   final GlobalKey<HomeTabState> _homeKey = GlobalKey<HomeTabState>();
@@ -60,8 +56,18 @@ class _PatientHomePageState extends State<PatientHomePage>
       _slideDirection = index > _index ? 1 : -1;
       _index = index;
     });
+    HapticFeedback.selectionClick();
     if (!reduceMotionOf(context)) _tabController.forward(from: 0);
   }
+
+  /// The refresh handler for each tab, or null where the tab has none.
+  late final List<VoidCallback?> _refreshers = [
+    () => _homeKey.currentState?.refresh(),
+    () => _appointmentsKey.currentState?.refresh(),
+    null,
+    () => _billingKey.currentState?.refresh(),
+    null,
+  ];
 
   @override
   void dispose() {
@@ -74,11 +80,7 @@ class _PatientHomePageState extends State<PatientHomePage>
     final session = widget.session;
     final pages = <Widget>[
       if (session != null)
-        HomeTab(
-          key: _homeKey,
-          session: session,
-          onOpenTab: _selectTab,
-        )
+        HomeTab(key: _homeKey, session: session, onOpenTab: _selectTab)
       else
         const _PlaceholderTab(
           icon: Icons.home_outlined,
@@ -86,10 +88,7 @@ class _PatientHomePageState extends State<PatientHomePage>
           description: 'Sign in again to see your dashboard.',
         ),
       if (session != null)
-        AppointmentsTab(
-          key: _appointmentsKey,
-          session: session,
-        )
+        AppointmentsTab(key: _appointmentsKey, session: session)
       else
         const _PlaceholderTab(
           icon: Icons.calendar_month_outlined,
@@ -105,10 +104,7 @@ class _PatientHomePageState extends State<PatientHomePage>
           description: 'Sign in again to load your medical records.',
         ),
       if (session != null)
-        BillingTab(
-          key: _billingKey,
-          session: session,
-        )
+        BillingTab(key: _billingKey, session: session)
       else
         const _PlaceholderTab(
           icon: Icons.receipt_long_outlined,
@@ -137,9 +133,10 @@ class _PatientHomePageState extends State<PatientHomePage>
             filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
             child: AppBar(
               title: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 240),
-                switchInCurve: Curves.easeOutCubic,
-                switchOutCurve: Curves.easeInCubic,
+                duration: Motion.panel,
+                reverseDuration: Motion.release,
+                switchInCurve: Motion.ease,
+                switchOutCurve: Motion.ease,
                 layoutBuilder: (currentChild, previousChildren) => Stack(
                   alignment: AlignmentDirectional.centerStart,
                   children: [...previousChildren, ?currentChild],
@@ -148,7 +145,7 @@ class _PatientHomePageState extends State<PatientHomePage>
                   opacity: animation,
                   child: SlideTransition(
                     position: Tween<Offset>(
-                      begin: const Offset(0, 0.35),
+                      begin: const Offset(0, 0.2),
                       end: Offset.zero,
                     ).animate(animation),
                     child: child,
@@ -177,74 +174,10 @@ class _PatientHomePageState extends State<PatientHomePage>
                 ),
               ),
               actions: [
-                if (_index == 0 && session != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: AppleTapBounce(
-                      onTap: () => _homeKey.currentState?.refresh(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppleColors.canvas,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppleColors.border,
-                            width: 0.8,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.refresh_rounded,
-                          size: 19,
-                          color: AppleColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_index == 1 && session != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: AppleTapBounce(
-                      onTap: () => _appointmentsKey.currentState?.refresh(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppleColors.canvas,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppleColors.border,
-                            width: 0.8,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.refresh_rounded,
-                          size: 19,
-                          color: AppleColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (_index == 3 && session != null)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: AppleTapBounce(
-                      onTap: () => _billingKey.currentState?.refresh(),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppleColors.canvas,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppleColors.border,
-                            width: 0.8,
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.refresh_rounded,
-                          size: 19,
-                          color: AppleColors.textPrimary,
-                        ),
-                      ),
-                    ),
+                if (session != null && _refreshers[_index] != null)
+                  _RefreshAction(
+                    key: ValueKey<int>(_index),
+                    onTap: _refreshers[_index]!,
                   ),
                 const SizedBox(width: 8),
               ],
@@ -258,14 +191,11 @@ class _PatientHomePageState extends State<PatientHomePage>
           builder: (context, child) => Opacity(
             opacity: _tabProgress.value,
             child: Transform.translate(
-              offset: Offset(_slideDirection * 22 * (1 - _tabProgress.value), 0),
+              offset: Offset(_slideDirection * 8 * (1 - _tabProgress.value), 0),
               child: child,
             ),
           ),
-          child: IndexedStack(
-            index: _index,
-            children: pages,
-          ),
+          child: IndexedStack(index: _index, children: pages),
         ),
       ),
       bottomNavigationBar: _AppleBottomNavBar(
@@ -276,30 +206,88 @@ class _PatientHomePageState extends State<PatientHomePage>
   }
 }
 
+class _RefreshAction extends StatelessWidget {
+  const _RefreshAction({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Tooltip(
+        message: 'Refresh',
+        child: AppleTapBounce(
+          onTap: onTap,
+          shrinkScale: 0.96,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppleColors.canvas,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppleColors.border, width: 0.8),
+            ),
+            child: const Icon(
+              Icons.refresh_rounded,
+              size: 19,
+              color: AppleColors.textPrimary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavDestination {
+  const _NavDestination(this.label, this.activeIcon, this.inactiveIcon);
+
+  final String label;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+}
+
+/// Bottom navigation: one tinted pill slides to the chosen tab.
 class _AppleBottomNavBar extends StatelessWidget {
-  const _AppleBottomNavBar({
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const _AppleBottomNavBar({required this.currentIndex, required this.onTap});
 
   final int currentIndex;
   final ValueChanged<int> onTap;
 
+  static const _destinations = [
+    _NavDestination('Home', Icons.home_rounded, Icons.home_outlined),
+    _NavDestination(
+      'Appointments',
+      Icons.calendar_month_rounded,
+      Icons.calendar_month_outlined,
+    ),
+    _NavDestination(
+      'Records',
+      Icons.folder_shared_rounded,
+      Icons.folder_shared_outlined,
+    ),
+    _NavDestination(
+      'Billing',
+      Icons.receipt_long_rounded,
+      Icons.receipt_long_outlined,
+    ),
+    _NavDestination('Profile', Icons.person_rounded, Icons.person_outline),
+  ];
+
+  static const _pillTop = 8.0;
+  static const _pillHeight = 30.0;
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final count = _destinations.length;
+    final reduceMotion = reduceMotionOf(context);
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.90),
+        color: Colors.white.withValues(alpha: 0.92),
         border: const Border(
           top: BorderSide(color: AppleColors.hairline, width: 0.8),
         ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x08000000),
-            blurRadius: 16,
-            offset: Offset(0, -4),
-          ),
-        ],
       ),
       child: ClipRect(
         child: BackdropFilter(
@@ -307,24 +295,30 @@ class _AppleBottomNavBar extends StatelessWidget {
           child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 60,
+              height: 64,
               child: Stack(
                 children: [
-                  AnimatedAlign(
-                    alignment: AlignmentDirectional(-1 + currentIndex / 2, -1),
-                    duration: const Duration(milliseconds: 320),
-                    curve: Curves.easeOutBack,
-                    child: FractionallySizedBox(
-                      widthFactor: 0.2,
-                      child: Center(
-                        heightFactor: 1,
-                        child: Container(
-                          width: 28,
-                          height: 3,
-                          decoration: const BoxDecoration(
-                            color: AppleColors.blue,
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(3),
+                  Positioned(
+                    top: _pillTop,
+                    left: 0,
+                    right: 0,
+                    height: _pillHeight,
+                    child: AnimatedAlign(
+                      alignment: Alignment(
+                        -1 + 2 * currentIndex / (count - 1),
+                        0,
+                      ),
+                      duration: reduceMotion ? Duration.zero : Motion.slide,
+                      curve: Motion.easeTravel,
+                      child: FractionallySizedBox(
+                        widthFactor: 1 / count,
+                        child: Center(
+                          child: Container(
+                            width: 54,
+                            height: _pillHeight,
+                            decoration: BoxDecoration(
+                              color: AppleColors.blueLight,
+                              borderRadius: BorderRadius.circular(999),
                             ),
                           ),
                         ),
@@ -332,49 +326,15 @@ class _AppleBottomNavBar extends StatelessWidget {
                     ),
                   ),
                   Row(
-                children: [
-                  _NavBarItem(
-                    index: 0,
-                    currentIndex: currentIndex,
-                    label: 'Home',
-                    activeIcon: Icons.home_rounded,
-                    inactiveIcon: Icons.home_outlined,
-                    onTap: onTap,
+                    children: [
+                      for (var i = 0; i < count; i++)
+                        _NavBarItem(
+                          destination: _destinations[i],
+                          selected: i == currentIndex,
+                          onTap: () => onTap(i),
+                        ),
+                    ],
                   ),
-                  _NavBarItem(
-                    index: 1,
-                    currentIndex: currentIndex,
-                    label: 'Appointments',
-                    activeIcon: Icons.calendar_month_rounded,
-                    inactiveIcon: Icons.calendar_month_outlined,
-                    onTap: onTap,
-                  ),
-                  _NavBarItem(
-                    index: 2,
-                    currentIndex: currentIndex,
-                    label: 'Records',
-                    activeIcon: Icons.folder_shared_rounded,
-                    inactiveIcon: Icons.folder_shared_outlined,
-                    onTap: onTap,
-                  ),
-                  _NavBarItem(
-                    index: 3,
-                    currentIndex: currentIndex,
-                    label: 'Billing',
-                    activeIcon: Icons.receipt_long_rounded,
-                    inactiveIcon: Icons.receipt_long_outlined,
-                    onTap: onTap,
-                  ),
-                  _NavBarItem(
-                    index: 4,
-                    currentIndex: currentIndex,
-                    label: 'Profile',
-                    activeIcon: Icons.person_rounded,
-                    inactiveIcon: Icons.person_outline,
-                    onTap: onTap,
-                  ),
-                ],
-              ),
                 ],
               ),
             ),
@@ -387,55 +347,74 @@ class _AppleBottomNavBar extends StatelessWidget {
 
 class _NavBarItem extends StatelessWidget {
   const _NavBarItem({
-    required this.index,
-    required this.currentIndex,
-    required this.label,
-    required this.activeIcon,
-    required this.inactiveIcon,
+    required this.destination,
+    required this.selected,
     required this.onTap,
   });
 
-  final int index;
-  final int currentIndex;
-  final String label;
-  final IconData activeIcon;
-  final IconData inactiveIcon;
-  final ValueChanged<int> onTap;
+  final _NavDestination destination;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = index == currentIndex;
-
+    final color = selected ? AppleColors.blue : AppleColors.textSecondary;
     return Expanded(
-      child: AppleTapBounce(
-        onTap: () => onTap(index),
-        shrinkScale: 0.94,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AnimatedScale(
-              scale: isSelected ? 1.12 : 1.0,
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeOutBack,
-              child: Icon(
-                isSelected ? activeIcon : inactiveIcon,
-                size: 24,
-                color: isSelected ? AppleColors.blue : AppleColors.textTertiary,
+      child: Semantics(
+        selected: selected,
+        button: true,
+        label: destination.label,
+        excludeSemantics: true,
+        child: AppleTapBounce(
+          onTap: onTap,
+          shrinkScale: 0.96,
+          child: Column(
+            children: [
+              SizedBox(
+                height:
+                    _AppleBottomNavBar._pillTop +
+                    _AppleBottomNavBar._pillHeight,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    top: _AppleBottomNavBar._pillTop,
+                  ),
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: Motion.hoverIn,
+                      reverseDuration: Motion.release,
+                      switchInCurve: Motion.ease,
+                      switchOutCurve: Motion.ease,
+                      child: Icon(
+                        selected
+                            ? destination.activeIcon
+                            : destination.inactiveIcon,
+                        key: ValueKey<bool>(selected),
+                        size: 22,
+                        color: color,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 3),
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOutCubic,
-              style: TextStyle(
-                fontSize: 10.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? AppleColors.blue : AppleColors.textTertiary,
-                letterSpacing: -0.2,
+              const SizedBox(height: 4),
+              AnimatedDefaultTextStyle(
+                duration: Motion.hoverIn,
+                curve: Motion.ease,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: color,
+                  letterSpacing: -0.1,
+                ),
+                child: Text(
+                  destination.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                ),
               ),
-              child: Text(label),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

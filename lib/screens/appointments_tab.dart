@@ -446,35 +446,11 @@ class _TokenHeroCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF1E1B4B)],
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 28,
-            offset: Offset(0, 12),
-          ),
-        ],
+        color: const Color(0xFF1D1D1F),
+        boxShadow: AppleColors.elevatedShadow,
       ),
       child: Stack(
         children: [
-          Positioned(
-            top: -40,
-            right: -24,
-            child: IgnorePointer(
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.06),
-                ),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -698,13 +674,9 @@ class _TokenCard extends StatelessWidget {
               Container(
                 width: 78,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: completed
-                        ? const [Color(0xFF059669), Color(0xFF10B981)]
-                        : const [Color(0xFF0071E3), Color(0xFF2563EB)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: completed
+                      ? const Color(0xFF248A3D)
+                      : AppleColors.blue,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Column(
@@ -941,7 +913,8 @@ class _FilterPill extends StatelessWidget {
     return AppleTapBounce(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: Motion.hoverIn,
+        curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
           color: selected ? activeBg : Colors.white,

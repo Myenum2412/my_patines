@@ -262,11 +262,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0071E3), Color(0xFF5AC8FA)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppleColors.blue,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   alignment: Alignment.center,
