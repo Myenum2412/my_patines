@@ -195,7 +195,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
               width: 38,
               height: 4.5,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: AppleColors.border,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -213,7 +213,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                           'Profile Avatar',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: -0.3,
                             color: AppleColors.textPrimary,
                           ),
@@ -267,7 +267,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: AppleColors.canvas,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: TabBar(
@@ -294,11 +294,11 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                   ],
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
-                labelColor: AppleColors.blue,
+                labelColor: AppleColors.brand,
                 unselectedLabelColor: AppleColors.textSecondary,
                 labelStyle: const TextStyle(
                   fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                 ),
                 unselectedLabelStyle: const TextStyle(
                   fontSize: 12.5,
@@ -332,7 +332,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                 child: FilledButton(
                   onPressed: _saving ? null : _handleSave,
                   style: FilledButton.styleFrom(
-                    backgroundColor: AppleColors.blue,
+                    backgroundColor: AppleColors.brand,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -353,7 +353,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                           'Save Avatar',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                 ),
@@ -419,7 +419,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
       initialsOf(widget.fullName),
       style: const TextStyle(
         fontSize: 32,
-        fontWeight: FontWeight.w800,
+        fontWeight: FontWeight.w600,
         letterSpacing: -0.5,
         color: Colors.white,
       ),
@@ -462,7 +462,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isSel ? AppleColors.blue : const Color(0xFFF1F5F9),
+                    color: isSel ? AppleColors.brand : AppleColors.canvas,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Center(
@@ -470,7 +470,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                       cat,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSel ? FontWeight.w700 : FontWeight.w600,
+                        fontWeight: isSel ? FontWeight.w600 : FontWeight.w600,
                         color: isSel ? Colors.white : AppleColors.textSecondary,
                       ),
                     ),
@@ -506,12 +506,12 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: isSelected ? AppleColors.blueLight : Colors.white,
+                    color: isSelected ? AppleColors.brandLight : Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: isSelected
-                          ? AppleColors.blue
-                          : const Color(0xFFE2E8F0),
+                          ? AppleColors.brand
+                          : AppleColors.border,
                       width: isSelected ? 2.5 : 1,
                     ),
                     boxShadow: [
@@ -545,10 +545,10 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: isSelected
-                                ? FontWeight.w700
+                                ? FontWeight.w600
                                 : FontWeight.w600,
                             color: isSelected
-                                ? AppleColors.blue
+                                ? AppleColors.brand
                                 : AppleColors.textPrimary,
                           ),
                         ),
@@ -558,7 +558,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                         style: TextStyle(
                           fontSize: 9.5,
                           color: isSelected
-                              ? AppleColors.blue.withValues(alpha: 0.8)
+                              ? AppleColors.brand.withValues(alpha: 0.8)
                               : AppleColors.textTertiary,
                         ),
                       ),
@@ -585,7 +585,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
           'Upload Your Photo',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: AppleColors.textPrimary,
           ),
         ),
@@ -608,10 +608,10 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   decoration: BoxDecoration(
-                    color: AppleColors.blueLight,
+                    color: AppleColors.brandLight,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppleColors.blue.withValues(alpha: 0.3),
+                      color: AppleColors.brand.withValues(alpha: 0.3),
                     ),
                   ),
                   child: const Column(
@@ -619,15 +619,15 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                       Icon(
                         Icons.photo_library_rounded,
                         size: 32,
-                        color: AppleColors.blue,
+                        color: AppleColors.brand,
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Photo Gallery',
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppleColors.blue,
+                          fontWeight: FontWeight.w600,
+                          color: AppleColors.brand,
                         ),
                       ),
                       SizedBox(height: 2),
@@ -635,7 +635,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                         'Choose from device',
                         style: TextStyle(
                           fontSize: 10.5,
-                          color: AppleColors.blue,
+                          color: AppleColors.brand,
                         ),
                       ),
                     ],
@@ -650,9 +650,9 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
+                    color: AppleColors.canvas,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: AppleColors.border),
                   ),
                   child: const Column(
                     children: [
@@ -666,7 +666,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                         'Take Photo',
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppleColors.textPrimary,
                         ),
                       ),
@@ -723,7 +723,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                         'Photo Selected',
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppleColors.green,
                         ),
                       ),
@@ -761,14 +761,14 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppleColors.canvas,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppleColors.border),
           ),
           child: const Row(
             children: [
               Icon(Icons.info_outline_rounded,
-                  size: 18, color: AppleColors.blue),
+                  size: 18, color: AppleColors.brand),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -795,7 +795,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
           'Gradient Monogram',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: AppleColors.textPrimary,
           ),
         ),
@@ -852,7 +852,7 @@ class _AvatarPickerModalState extends State<_AvatarPickerModal>
                     initialsOf(widget.fullName),
                     style: const TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),

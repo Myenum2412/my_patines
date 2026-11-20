@@ -65,13 +65,6 @@ class PatientAvatarView extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(size * 0.32),
-          boxShadow: [
-            BoxShadow(
-              color: gradient.first.withValues(alpha: 0.25),
-              blurRadius: size * 0.22,
-              offset: Offset(0, size * 0.08),
-            ),
-          ],
         ),
         child: inner,
       );
@@ -96,7 +89,7 @@ class PatientAvatarView extends StatelessWidget {
                 width: badgeSize,
                 height: badgeSize,
                 decoration: BoxDecoration(
-                  color: AppleColors.blue,
+                  color: AppleColors.brand,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: [
@@ -150,7 +143,7 @@ class PatientAvatarView extends StatelessWidget {
         initialsOf(fullName),
         style: TextStyle(
           fontSize: size * 0.38,
-          fontWeight: FontWeight.w800,
+          fontWeight: FontWeight.w600,
           letterSpacing: -0.5,
           color: Colors.white,
         ),

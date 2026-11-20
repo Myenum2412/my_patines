@@ -1,8 +1,9 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/patient_session.dart';
+import '../services/patient_portal_service.dart';
+import '../services/records_service.dart';
 import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
 import 'appointments_tab.dart';
@@ -12,11 +13,23 @@ import 'medical_records_tab.dart';
 import 'profile_tab.dart';
 
 class PatientHomePage extends StatefulWidget {
-  const PatientHomePage({super.key, this.session, this.userName, this.email});
+  const PatientHomePage({
+    super.key,
+    this.session,
+    this.userName,
+    this.email,
+    this.portalService,
+    this.recordsService,
+  });
 
   final PatientSession? session;
   final String? userName;
   final String? email;
+
+  /// Optional injected services (used by tests and screenshots). When omitted
+  /// each tab creates its own client for [session].
+  final PatientPortalService? portalService;
+  final RecordsService? recordsService;
 
   @override
   State<PatientHomePage> createState() => _PatientHomePageState();
@@ -80,7 +93,12 @@ class _PatientHomePageState extends State<PatientHomePage>
     final session = widget.session;
     final pages = <Widget>[
       if (session != null)
-        HomeTab(key: _homeKey, session: session, onOpenTab: _selectTab)
+        HomeTab(
+          key: _homeKey,
+          session: session,
+          onOpenTab: _selectTab,
+          service: widget.portalService,
+        )
       else
         const _PlaceholderTab(
           icon: Icons.home_outlined,
@@ -88,7 +106,11 @@ class _PatientHomePageState extends State<PatientHomePage>
           description: 'Sign in again to see your dashboard.',
         ),
       if (session != null)
-        AppointmentsTab(key: _appointmentsKey, session: session)
+        AppointmentsTab(
+          key: _appointmentsKey,
+          session: session,
+          service: widget.portalService,
+        )
       else
         const _PlaceholderTab(
           icon: Icons.calendar_month_outlined,
@@ -96,7 +118,7 @@ class _PatientHomePageState extends State<PatientHomePage>
           description: 'Sign in again to see your tokens.',
         ),
       if (session != null)
-        MedicalRecordsTab(session: session)
+        MedicalRecordsTab(session: session, service: widget.recordsService)
       else
         const _PlaceholderTab(
           icon: Icons.folder_shared_outlined,
@@ -104,7 +126,11 @@ class _PatientHomePageState extends State<PatientHomePage>
           description: 'Sign in again to load your medical records.',
         ),
       if (session != null)
-        BillingTab(key: _billingKey, session: session)
+        BillingTab(
+          key: _billingKey,
+          session: session,
+          service: widget.portalService,
+        )
       else
         const _PlaceholderTab(
           icon: Icons.receipt_long_outlined,
@@ -114,6 +140,7 @@ class _PatientHomePageState extends State<PatientHomePage>
       if (session != null)
         ProfileTab(
           session: session,
+          service: widget.portalService,
           onProfileUpdated: () => _homeKey.currentState?.refresh(),
         )
       else
@@ -126,64 +153,54 @@ class _PatientHomePageState extends State<PatientHomePage>
 
     return Scaffold(
       backgroundColor: AppleColors.canvas,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-            child: AppBar(
-              title: AnimatedSwitcher(
-                duration: Motion.panel,
-                reverseDuration: Motion.release,
-                switchInCurve: Motion.ease,
-                switchOutCurve: Motion.ease,
-                layoutBuilder: (currentChild, previousChildren) => Stack(
-                  alignment: AlignmentDirectional.centerStart,
-                  children: [...previousChildren, ?currentChild],
-                ),
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.2),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  ),
-                ),
-                child: Text(
-                  _titles[_index],
-                  key: ValueKey<int>(_index),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                    color: AppleColors.textPrimary,
-                  ),
-                ),
-              ),
-              backgroundColor: Colors.white.withValues(alpha: 0.85),
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              centerTitle: false,
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(0.8),
-                child: Container(
-                  color: AppleColors.border.withValues(alpha: 0.6),
-                  height: 0.8,
-                ),
-              ),
-              actions: [
-                if (session != null && _refreshers[_index] != null)
-                  _RefreshAction(
-                    key: ValueKey<int>(_index),
-                    onTap: _refreshers[_index]!,
-                  ),
-                const SizedBox(width: 8),
-              ],
+      appBar: AppBar(
+        toolbarHeight: 64,
+        titleSpacing: 20,
+        backgroundColor: AppleColors.canvas,
+        title: AnimatedSwitcher(
+          duration: Motion.panel,
+          reverseDuration: Motion.release,
+          switchInCurve: Motion.ease,
+          switchOutCurve: Motion.ease,
+          layoutBuilder: (currentChild, previousChildren) => Stack(
+            alignment: AlignmentDirectional.centerStart,
+            children: [...previousChildren, ?currentChild],
+          ),
+          transitionBuilder: (child, animation) => FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.2),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
             ),
           ),
+          child: _index == 0
+              ? Semantics(
+                  key: const ValueKey<int>(0),
+                  header: true,
+                  label: 'MyClinic home',
+                  child: Image.asset(
+                    'assets/images/logo-wordmark.png',
+                    height: 30,
+                    excludeFromSemantics: true,
+                  ),
+                )
+              : Text(
+                  _titles[_index],
+                  key: ValueKey<int>(_index),
+                  style: AppType.title.copyWith(fontSize: 28),
+                ),
         ),
+        actions: [
+          if (session != null && _refreshers[_index] != null)
+            _RefreshAction(
+              key: ValueKey<int>(_index),
+              onTap: _refreshers[_index]!,
+            ),
+          const SizedBox(width: 12),
+        ],
       ),
       body: SafeArea(
         child: AnimatedBuilder(
@@ -213,26 +230,23 @@ class _RefreshAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Tooltip(
-        message: 'Refresh',
-        child: AppleTapBounce(
-          onTap: onTap,
-          shrinkScale: 0.96,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppleColors.canvas,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppleColors.border, width: 0.8),
-            ),
-            child: const Icon(
-              Icons.refresh_rounded,
-              size: 19,
-              color: AppleColors.textPrimary,
-            ),
+    return Tooltip(
+      message: 'Refresh',
+      child: AppleTapBounce(
+        onTap: onTap,
+        shrinkScale: 0.96,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppleColors.hairline),
+          ),
+          child: const Icon(
+            Icons.refresh_rounded,
+            size: 20,
+            color: AppleColors.textPrimary,
           ),
         ),
       ),
@@ -248,7 +262,8 @@ class _NavDestination {
   final IconData inactiveIcon;
 }
 
-/// Bottom navigation: one tinted pill slides to the chosen tab.
+/// Bottom navigation: a floating white bar whose blue pill, painted in the
+/// logo's gradient, slides to the chosen tab.
 class _AppleBottomNavBar extends StatelessWidget {
   const _AppleBottomNavBar({required this.currentIndex, required this.onTap});
 
@@ -275,68 +290,62 @@ class _AppleBottomNavBar extends StatelessWidget {
     _NavDestination('Profile', Icons.person_rounded, Icons.person_outline),
   ];
 
-  static const _pillTop = 8.0;
-  static const _pillHeight = 30.0;
+  static const _height = 64.0;
 
   @override
   Widget build(BuildContext context) {
     final count = _destinations.length;
     final reduceMotion = reduceMotionOf(context);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.92),
-        border: const Border(
-          top: BorderSide(color: AppleColors.hairline, width: 0.8),
-        ),
-      ),
-      child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: SafeArea(
-            top: false,
-            child: SizedBox(
-              height: 64,
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: _pillTop,
-                    left: 0,
-                    right: 0,
-                    height: _pillHeight,
-                    child: AnimatedAlign(
-                      alignment: Alignment(
-                        -1 + 2 * currentIndex / (count - 1),
-                        0,
-                      ),
-                      duration: reduceMotion ? Duration.zero : Motion.slide,
-                      curve: Motion.easeTravel,
-                      child: FractionallySizedBox(
-                        widthFactor: 1 / count,
-                        child: Center(
-                          child: Container(
-                            width: 54,
-                            height: _pillHeight,
-                            decoration: BoxDecoration(
-                              color: AppleColors.blueLight,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
+    return ColoredBox(
+      color: AppleColors.canvas,
+      child: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.only(bottom: 10),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 6, 14, 0),
+          child: Container(
+            height: _height,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(_height / 2),
+              border: Border.all(color: AppleColors.hairline),
+              boxShadow: AppleColors.elevatedShadow,
+            ),
+            padding: const EdgeInsets.all(6),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: AnimatedAlign(
+                    alignment: Alignment(
+                      -1 + 2 * currentIndex / (count - 1),
+                      0,
+                    ),
+                    duration: reduceMotion ? Duration.zero : Motion.slide,
+                    curve: Motion.easeTravel,
+                    child: FractionallySizedBox(
+                      widthFactor: 1 / count,
+                      heightFactor: 1,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: AppleColors.brandGradient,
+                          borderRadius: BorderRadius.circular(_height / 2),
+                          boxShadow: AppleColors.brandShadow,
                         ),
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      for (var i = 0; i < count; i++)
-                        _NavBarItem(
-                          destination: _destinations[i],
-                          selected: i == currentIndex,
-                          onTap: () => onTap(i),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+                Row(
+                  children: [
+                    for (var i = 0; i < count; i++)
+                      _NavBarItem(
+                        destination: _destinations[i],
+                        selected: i == currentIndex,
+                        onTap: () => onTap(i),
+                      ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
@@ -358,7 +367,7 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppleColors.blue : AppleColors.textSecondary;
+    final color = selected ? Colors.white : AppleColors.textTertiary;
     return Expanded(
       child: Semantics(
         selected: selected,
@@ -369,48 +378,46 @@ class _NavBarItem extends StatelessWidget {
           onTap: onTap,
           shrinkScale: 0.96,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                height:
-                    _AppleBottomNavBar._pillTop +
-                    _AppleBottomNavBar._pillHeight,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: _AppleBottomNavBar._pillTop,
-                  ),
-                  child: Center(
-                    child: AnimatedSwitcher(
-                      duration: Motion.hoverIn,
-                      reverseDuration: Motion.release,
-                      switchInCurve: Motion.ease,
-                      switchOutCurve: Motion.ease,
-                      child: Icon(
-                        selected
-                            ? destination.activeIcon
-                            : destination.inactiveIcon,
-                        key: ValueKey<bool>(selected),
-                        size: 22,
-                        color: color,
-                      ),
-                    ),
-                  ),
+              AnimatedSwitcher(
+                duration: Motion.hoverIn,
+                reverseDuration: Motion.release,
+                switchInCurve: Motion.ease,
+                switchOutCurve: Motion.ease,
+                child: Icon(
+                  selected ? destination.activeIcon : destination.inactiveIcon,
+                  key: ValueKey<bool>(selected),
+                  size: 22,
+                  color: color,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
+              // Merge with the inherited style so the label keeps the app's
+              // font; a bare TextStyle would fall back to the platform face.
               AnimatedDefaultTextStyle(
                 duration: Motion.hoverIn,
                 curve: Motion.ease,
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                  color: color,
-                  letterSpacing: -0.1,
+                style: DefaultTextStyle.of(context).style.merge(
+                  TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    color: color,
+                    letterSpacing: 0,
+                  ),
                 ),
-                child: Text(
-                  destination.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.fade,
-                  softWrap: false,
+                // Long labels shrink to fit their slot so they stay inside
+                // the selected pill.
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      destination.label,
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -444,17 +451,17 @@ class _PlaceholderTab extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppleColors.blueLight,
+                color: AppleColors.brandLight,
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: Icon(icon, size: 40, color: AppleColors.blue),
+              child: Icon(icon, size: 40, color: AppleColors.brand),
             ),
             const SizedBox(height: 18),
             Text(
               title,
               style: const TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppleColors.textPrimary,
                 letterSpacing: -0.4,
               ),

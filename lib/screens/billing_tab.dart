@@ -214,7 +214,7 @@ class BillingTabState extends State<BillingTab> {
 
     final content = RefreshIndicator(
       onRefresh: refresh,
-      color: const Color(0xFF2196F3),
+      color: AppleColors.brand,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -232,12 +232,7 @@ class BillingTabState extends State<BillingTab> {
               const Expanded(
                 child: Text(
                   'Invoices',
-                  style: TextStyle(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                    color: Color(0xFF0F172A),
-                  ),
+                  style: AppType.heading,
                 ),
               ),
               if (isFilterActive) ...[
@@ -249,8 +244,8 @@ class BillingTabState extends State<BillingTab> {
                       'Reset',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppleColors.blue,
+                        fontWeight: FontWeight.w600,
+                        color: AppleColors.brand,
                       ),
                     ),
                   ),
@@ -262,7 +257,7 @@ class BillingTabState extends State<BillingTab> {
                 style: const TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                 ),
               ),
             ],
@@ -272,33 +267,33 @@ class BillingTabState extends State<BillingTab> {
           Container(
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: AppleColors.canvas,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+              border: Border.all(color: AppleColors.border, width: 0.8),
             ),
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val),
               style: const TextStyle(
                 fontSize: 13,
-                color: Color(0xFF0F172A),
+                color: AppleColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: 'Search by invoice #, item, or notes...',
                 hintStyle: const TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                   fontWeight: FontWeight.w400,
                 ),
                 prefixIcon: const Icon(
                   Icons.search_rounded,
                   size: 18,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                 ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF64748B)),
+                        icon: const Icon(Icons.close_rounded, size: 16, color: AppleColors.textSecondary),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
@@ -337,7 +332,7 @@ class BillingTabState extends State<BillingTab> {
                   height: 20,
                   width: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: const Color(0xFFCBD5E1),
+                  color: AppleColors.border,
                 ),
                 _BillFilterChip(
                   label: 'All time',
@@ -370,7 +365,7 @@ class BillingTabState extends State<BillingTab> {
                   height: 20,
                   width: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: const Color(0xFFCBD5E1),
+                  color: AppleColors.border,
                 ),
                 PopupMenuButton<_BillSort>(
                   tooltip: 'Sort invoices',
@@ -397,10 +392,10 @@ class BillingTabState extends State<BillingTab> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                     decoration: BoxDecoration(
-                      color: _sort != _BillSort.newest ? AppleColors.blue : Colors.white,
+                      color: _sort != _BillSort.newest ? AppleColors.brand : Colors.white,
                       borderRadius: BorderRadius.circular(999),
                       border: Border.all(
-                        color: _sort != _BillSort.newest ? AppleColors.blue : AppleColors.border,
+                        color: _sort != _BillSort.newest ? AppleColors.brand : AppleColors.border,
                         width: 0.8,
                       ),
                       boxShadow: AppleColors.cardShadow,
@@ -461,7 +456,7 @@ class BillingTabState extends State<BillingTab> {
           const Center(
             child: Text(
               'Pull down to refresh',
-              style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
             ),
           ),
         ],
@@ -496,9 +491,10 @@ class BillingTabState extends State<BillingTab> {
             Text(
               formatMoney(bill.total),
               style: const TextStyle(
+                fontFamily: AppType.displayFamily,
                 fontSize: 20,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w500,
+                color: AppleColors.textPrimary,
               ),
             ),
           ],
@@ -545,7 +541,7 @@ class BillingTabState extends State<BillingTab> {
             if (bill.items.isEmpty)
               const Text(
                 'No line items were recorded for this invoice.',
-                style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                style: TextStyle(fontSize: 13, color: AppleColors.textSecondary),
               )
             else
               for (final item in bill.items) _BillItemRow(item: item),
@@ -564,7 +560,7 @@ class BillingTabState extends State<BillingTab> {
               DetailAmountRow(
                 label: 'Discount',
                 value: '-${formatMoney(bill.discount)}',
-                color: const Color(0xFF15803D),
+                color: AppleColors.green,
               ),
             if (bill.taxAmount > 0)
               DetailAmountRow(
@@ -572,7 +568,7 @@ class BillingTabState extends State<BillingTab> {
                     '${bill.taxPercent > 0 ? ' (${_trimNumber(bill.taxPercent)}%)' : ''}',
                 value: formatMoney(bill.taxAmount),
               ),
-            const Divider(height: 16, color: Color(0xFFE2E8F0)),
+            const Divider(height: 16, color: AppleColors.border),
             DetailAmountRow(
               label: 'Total',
               value: formatMoney(bill.total),
@@ -581,20 +577,20 @@ class BillingTabState extends State<BillingTab> {
             DetailAmountRow(
               label: 'Amount paid',
               value: formatMoney(bill.amountPaid),
-              color: const Color(0xFF15803D),
+              color: AppleColors.green,
             ),
             if (bill.outstanding > 0)
               DetailAmountRow(
                 label: 'Balance due',
                 value: formatMoney(bill.outstanding),
-                color: const Color(0xFFB91C1C),
+                color: AppleColors.red,
                 emphasized: true,
               )
             else
               DetailAmountRow(
                 label: 'Balance due',
                 value: formatMoney(0),
-                color: const Color(0xFF15803D),
+                color: AppleColors.green,
               ),
           ],
         ),
@@ -610,9 +606,9 @@ class BillingTabState extends State<BillingTab> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppleColors.canvas,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: AppleColors.border),
           ),
           child: const Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -620,7 +616,7 @@ class BillingTabState extends State<BillingTab> {
               Icon(
                 Icons.info_outline_rounded,
                 size: 17,
-                color: Color(0xFF64748B),
+                color: AppleColors.textSecondary,
               ),
               SizedBox(width: 8),
               Expanded(
@@ -629,7 +625,7 @@ class BillingTabState extends State<BillingTab> {
                   style: TextStyle(
                     fontSize: 11.5,
                     height: 1.45,
-                    color: Color(0xFF64748B),
+                    color: AppleColors.textSecondary,
                   ),
                 ),
               ),
@@ -650,8 +646,8 @@ class BillingTabState extends State<BillingTab> {
                     _handleDownloadPdf(bill);
                   },
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF2563EB),
-                    side: const BorderSide(color: Color(0xFFBFDBFE)),
+                    foregroundColor: AppleColors.brand,
+                    side: const BorderSide(color: AppleColors.brandLight),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -672,8 +668,8 @@ class BillingTabState extends State<BillingTab> {
                   _openPdfViewer(bill);
                 },
                 style: IconButton.styleFrom(
-                  foregroundColor: const Color(0xFF2563EB),
-                  side: const BorderSide(color: Color(0xFFBFDBFE)),
+                  foregroundColor: AppleColors.brand,
+                  side: const BorderSide(color: AppleColors.brandLight),
                   padding: const EdgeInsets.all(12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -695,7 +691,7 @@ class BillingTabState extends State<BillingTab> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF1D1D1F),
+        backgroundColor: AppleColors.textPrimary,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         duration: const Duration(seconds: 2),
         content: Row(
@@ -753,12 +749,12 @@ class BillingTabState extends State<BillingTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFF1D1D1F),
+          backgroundColor: AppleColors.textPrimary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           duration: const Duration(seconds: 6),
           content: Row(
             children: [
-              const Icon(Icons.check_circle_rounded, color: Color(0xFF34C759), size: 20),
+              const Icon(Icons.check_circle_rounded, color: AppleColors.green, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -772,7 +768,7 @@ class BillingTabState extends State<BillingTab> {
           ),
           action: SnackBarAction(
             label: 'View',
-            textColor: const Color(0xFF60A5FA),
+            textColor: AppleColors.brandOnDark,
             onPressed: () => _openPdfViewer(bill, bytes),
           ),
         ),
@@ -783,7 +779,7 @@ class BillingTabState extends State<BillingTab> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: AppleColors.red,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           content: Text('Failed to generate invoice PDF: $err'),
         ),
@@ -822,16 +818,19 @@ class _BillingSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settled = outstanding <= 0.009;
-    return Container(
+    return OneShotSheen(
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: settled ? const Color(0xFF0F5132) : const Color(0xFF1D1D1F),
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        color: settled ? AppleColors.green : null,
+        gradient: settled ? null : AppleColors.brandGradient,
+        boxShadow: settled ? null : AppleColors.brandShadow,
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.12),
           width: 0.8,
         ),
-        boxShadow: AppleColors.elevatedShadow,
       ),
       child: Stack(
         children: [
@@ -865,7 +864,7 @@ class _BillingSummaryCard extends StatelessWidget {
                             'Billing overview',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: Colors.white,
                               letterSpacing: -0.1,
                             ),
@@ -911,9 +910,10 @@ class _BillingSummaryCard extends StatelessWidget {
                   child: Text(
                     formatMoney(outstanding),
                     style: const TextStyle(
+                      fontFamily: AppType.displayFamily,
                       fontSize: 34,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -1.0,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: -0.3,
                       color: Colors.white,
                       height: 1.1,
                     ),
@@ -990,7 +990,7 @@ class _BillingSummaryCard extends StatelessWidget {
                                 '$percent% paid',
                                 style: const TextStyle(
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w700,
+                                  fontWeight: FontWeight.w600,
                                   color: Colors.white,
                                 ),
                               ),
@@ -1009,8 +1009,8 @@ class _BillingSummaryCard extends StatelessWidget {
                               widthFactor: ratio,
                               child: Container(
                                 color: settled
-                                    ? const Color(0xFF34C759)
-                                    : const Color(0xFF64ACFF),
+                                    ? AppleColors.green
+                                    : AppleColors.brandOnDark,
                               ),
                             ),
                           ),
@@ -1024,6 +1024,7 @@ class _BillingSummaryCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -1044,7 +1045,7 @@ class _SummaryMiniStat extends StatelessWidget {
           style: const TextStyle(
             fontSize: 10.5,
             fontWeight: FontWeight.w500,
-            color: Color(0xFFC7D2FE),
+            color: Color(0x99FFFFFF),
           ),
         ),
         const SizedBox(height: 3),
@@ -1055,7 +1056,7 @@ class _SummaryMiniStat extends StatelessWidget {
             value,
             style: const TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: Colors.white,
             ),
           ),
@@ -1087,10 +1088,10 @@ class _BillFilterChip extends StatelessWidget {
         curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? AppleColors.blue : Colors.white,
+          color: selected ? AppleColors.brand : Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected ? AppleColors.blue : AppleColors.border,
+            color: selected ? AppleColors.brand : AppleColors.border,
             width: 0.8,
           ),
         ),
@@ -1109,7 +1110,7 @@ class _BillFilterChip extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w600,
                 color: selected ? Colors.white : AppleColors.textPrimary,
                 letterSpacing: -0.1,
               ),
@@ -1136,7 +1137,7 @@ class _BillCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppleColors.border, width: 0.8),
           boxShadow: AppleColors.cardShadow,
         ),
@@ -1166,7 +1167,7 @@ class _BillCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: AppleColors.textPrimary,
                       letterSpacing: -0.2,
                     ),
@@ -1185,7 +1186,7 @@ class _BillCard extends StatelessWidget {
               [
                 formatDate(bill.invoiceDate),
                 if ((bill.doctorName ?? '').trim().isNotEmpty)
-                  'Dr. ${bill.doctorName!.trim()}',
+                  doctorTitle(bill.doctorName),
               ].join(' · '),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -1295,7 +1296,7 @@ class _BillAmount extends StatelessWidget {
           style: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF94A3B8),
+            color: AppleColors.textTertiary,
           ),
         ),
         const SizedBox(height: 2),
@@ -1306,7 +1307,7 @@ class _BillAmount extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 13,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: color,
             ),
           ),
@@ -1338,7 +1339,7 @@ class _BillItemRow extends StatelessWidget {
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     height: 1.35,
-                    color: Color(0xFF0F172A),
+                    color: AppleColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 1),
@@ -1347,7 +1348,7 @@ class _BillItemRow extends StatelessWidget {
                   '${item.taxPercent > 0 ? ' · ${_trimNumber(item.taxPercent)}% tax' : ''}',
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF64748B),
+                    color: AppleColors.textSecondary,
                   ),
                 ),
               ],
@@ -1358,8 +1359,8 @@ class _BillItemRow extends StatelessWidget {
             formatMoney(item.lineTotal),
             style: const TextStyle(
               fontSize: 12.5,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w600,
+              color: AppleColors.textPrimary,
             ),
           ),
         ],
@@ -1381,7 +1382,7 @@ class _BillsEmpty extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppleColors.border),
       ),
       child: Column(
         children: [
@@ -1390,15 +1391,15 @@ class _BillsEmpty extends StatelessWidget {
                 ? Icons.filter_alt_off_outlined
                 : Icons.receipt_long_outlined,
             size: 48,
-            color: const Color(0xFFCBD5E1),
+            color: AppleColors.border,
           ),
           const SizedBox(height: 12),
           Text(
             filtered ? 'No invoices in this filter' : 'No bills yet',
             style: const TextStyle(
               fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF0F172A),
+              fontWeight: FontWeight.w600,
+              color: AppleColors.textPrimary,
             ),
           ),
           const SizedBox(height: 5),
@@ -1410,7 +1411,7 @@ class _BillsEmpty extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12.5,
               height: 1.45,
-              color: Color(0xFF64748B),
+              color: AppleColors.textSecondary,
             ),
           ),
           if (filtered) ...[
@@ -1442,7 +1443,7 @@ class _BillingError extends StatelessWidget {
         const Icon(
           Icons.cloud_off_outlined,
           size: 52,
-          color: Color(0xFF94A3B8),
+          color: AppleColors.textTertiary,
         ),
         const SizedBox(height: 16),
         Text(
@@ -1451,7 +1452,7 @@ class _BillingError extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             height: 1.45,
-            color: Color(0xFF475569),
+            color: AppleColors.textSecondary,
           ),
         ),
         const SizedBox(height: 20),
@@ -1469,15 +1470,15 @@ class _BillingError extends StatelessWidget {
 
 ({Color color, Color background}) _statusStyle(BillEntry bill) {
   if (bill.isVoid || bill.isDraft) {
-    return (color: const Color(0xFF64748B), background: const Color(0xFFF1F5F9));
+    return (color: AppleColors.textSecondary, background: AppleColors.canvas);
   }
   if (bill.isPaid) {
-    return (color: const Color(0xFF15803D), background: const Color(0xFFDCFCE7));
+    return (color: AppleColors.green, background: AppleColors.greenLight);
   }
   if (bill.paymentStatus == 'partial' || bill.amountPaid > 0) {
-    return (color: const Color(0xFFB45309), background: const Color(0xFFFEF3C7));
+    return (color: AppleColors.orange, background: AppleColors.orangeLight);
   }
-  return (color: const Color(0xFFB91C1C), background: const Color(0xFFFEE2E2));
+  return (color: AppleColors.red, background: AppleColors.redLight);
 }
 
 String _trimNumber(double value) {

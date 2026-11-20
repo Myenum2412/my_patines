@@ -240,7 +240,7 @@ class _InvoicePdfPreviewPageState extends State<InvoicePdfPreviewPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: AppleColors.blue),
+            CircularProgressIndicator(color: AppleColors.brand),
             SizedBox(height: 14),
             Text(
               'Generating Apple-styled PDF invoice...',

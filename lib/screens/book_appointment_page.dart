@@ -203,10 +203,11 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 const Text(
                   'Appointment Booked!',
                   style: TextStyle(
+                    fontFamily: AppType.displayFamily,
                     fontSize: 20,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                     color: AppleColors.textPrimary,
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -287,7 +288,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               fontSize: 12.5,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppleColors.textPrimary,
             ),
           ),
@@ -315,7 +316,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
               'Book Appointment',
               style: TextStyle(
                 fontSize: 17,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppleColors.textPrimary,
                 letterSpacing: -0.3,
               ),
@@ -446,7 +447,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: AppleColors.blue,
+              color: AppleColors.brand,
               borderRadius: BorderRadius.circular(14),
             ),
             alignment: Alignment.center,
@@ -454,7 +455,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
               initialsOf(patientName),
               style: const TextStyle(
                 fontSize: 18,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
             ),
@@ -473,7 +474,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppleColors.textPrimary,
                         ),
                       ),
@@ -489,8 +490,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                         'Booking for You',
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF059669),
+                          fontWeight: FontWeight.w600,
+                          color: AppleColors.green,
                         ),
                       ),
                     ),
@@ -520,7 +521,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
           title,
           style: const TextStyle(
             fontSize: 14.5,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: AppleColors.textPrimary,
             letterSpacing: -0.2,
           ),
@@ -539,7 +540,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
       return Container(
         height: 130,
         alignment: Alignment.center,
-        child: const CircularProgressIndicator(color: AppleColors.blue),
+        child: const CircularProgressIndicator(color: AppleColors.brand),
       );
     }
 
@@ -618,13 +619,13 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isSelected ? AppleColors.blue : AppleColors.border,
+                        color: isSelected ? AppleColors.brand : AppleColors.border,
                         width: isSelected ? 2.0 : 0.8,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: AppleColors.blue.withValues(alpha: 0.14),
+                                color: AppleColors.brand.withValues(alpha: 0.14),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
@@ -638,14 +639,14 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: isSelected ? AppleColors.blueLight : const Color(0xFFF1F5F9),
+                            color: isSelected ? AppleColors.brandLight : AppleColors.canvas,
                             borderRadius: BorderRadius.circular(14),
                           ),
                           alignment: Alignment.center,
                           child: Icon(
                             Icons.medical_services_outlined,
                             size: 24,
-                            color: isSelected ? AppleColors.blue : const Color(0xFF475569),
+                            color: isSelected ? AppleColors.brand : AppleColors.textSecondary,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -657,8 +658,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                                 doc.displayName,
                                 style: TextStyle(
                                   fontSize: 14.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected ? AppleColors.blue : AppleColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected ? AppleColors.brand : AppleColors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -669,7 +670,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF475569),
+                                  color: AppleColors.textSecondary,
                                 ),
                               ),
                               if (metaParts.isNotEmpty) ...[
@@ -684,15 +685,15 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF8FAFC),
+                                    color: AppleColors.canvas,
                                     borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                                    border: Border.all(color: AppleColors.border),
                                   ),
                                   child: Text(
                                     availability,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                                    style: const TextStyle(fontSize: 10, color: AppleColors.textSecondary),
                                   ),
                                 ),
                               ],
@@ -706,7 +707,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? AppleColors.blue : AppleColors.border,
+                              color: isSelected ? AppleColors.brand : AppleColors.border,
                               width: isSelected ? 6 : 1.5,
                             ),
                           ),
@@ -756,7 +757,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       type,
                       style: TextStyle(
                         fontSize: 12.5,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                         color: isSelected ? Colors.white : AppleColors.textPrimary,
                       ),
                     ),
@@ -786,7 +787,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
             ),
             Text(
               formatDate(_selectedDate),
-              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700, color: AppleColors.blue),
+              style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppleColors.brand),
             ),
           ],
         ),
@@ -813,15 +814,15 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                     width: 58,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppleColors.blue : Colors.white,
+                      color: isSelected ? AppleColors.brand : Colors.white,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: isSelected ? AppleColors.blue : AppleColors.border,
+                        color: isSelected ? AppleColors.brand : AppleColors.border,
                       ),
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: AppleColors.blue.withValues(alpha: 0.25),
+                                color: AppleColors.brand.withValues(alpha: 0.25),
                                 blurRadius: 10,
                                 offset: const Offset(0, 3),
                               ),
@@ -843,7 +844,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                           '${d.day}',
                           style: TextStyle(
                             fontSize: 17,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: isSelected ? Colors.white : AppleColors.textPrimary,
                           ),
                         ),
@@ -884,7 +885,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                   SizedBox(width: 6),
                   Text(
                     'Morning Sessions',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppleColors.textPrimary),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppleColors.textPrimary),
                   ),
                 ],
               ),
@@ -904,7 +905,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                   SizedBox(width: 6),
                   Text(
                     'Evening Sessions',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppleColors.textPrimary),
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppleColors.textPrimary),
                   ),
                 ],
               ),
@@ -932,17 +933,17 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
         curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
-          color: isSelected ? AppleColors.blue : const Color(0xFFF8FAFC),
+          color: isSelected ? AppleColors.brand : AppleColors.canvas,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? AppleColors.blue : const Color(0xFFE2E8F0),
+            color: isSelected ? AppleColors.brand : AppleColors.border,
           ),
         ),
         child: Text(
           display,
           style: TextStyle(
             fontSize: 12,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w600,
             color: isSelected ? Colors.white : AppleColors.textPrimary,
           ),
         ),
@@ -1012,7 +1013,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
           Row(
             children: _priorities.map((p) {
               final isSelected = _priority == p;
-              Color activeColor = AppleColors.blue;
+              Color activeColor = AppleColors.brand;
               if (p == 'High') activeColor = AppleColors.orange;
               if (p == 'Urgent') activeColor = AppleColors.red;
 
@@ -1025,10 +1026,10 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                     curve: Motion.ease,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isSelected ? activeColor.withValues(alpha: 0.15) : const Color(0xFFF8FAFC),
+                      color: isSelected ? activeColor.withValues(alpha: 0.15) : AppleColors.canvas,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: isSelected ? activeColor : const Color(0xFFE2E8F0),
+                        color: isSelected ? activeColor : AppleColors.border,
                         width: isSelected ? 1.5 : 1.0,
                       ),
                     ),
@@ -1036,7 +1037,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                       p,
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                         color: isSelected ? activeColor : AppleColors.textPrimary,
                       ),
                     ),
@@ -1069,7 +1070,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                     color: AppleColors.greenLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF059669), size: 18),
+                  child: const Icon(Icons.chat_bubble_outline_rounded, color: AppleColors.green, size: 18),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -1105,10 +1106,10 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: AppleColors.blueLight,
+                    color: AppleColors.brandLight,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.notifications_active_outlined, color: AppleColors.blue, size: 18),
+                  child: const Icon(Icons.notifications_active_outlined, color: AppleColors.brand, size: 18),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
@@ -1131,7 +1132,7 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 Switch.adaptive(
                   value: _doctorNotification,
                   onChanged: (val) => setState(() => _doctorNotification = val),
-                  activeTrackColor: AppleColors.blue,
+                  activeTrackColor: AppleColors.brand,
                 ),
               ],
             ),
@@ -1150,20 +1151,20 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppleColors.canvas,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppleColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Row(
             children: [
-              Icon(Icons.receipt_outlined, size: 17, color: Color(0xFF0F172A)),
+              Icon(Icons.receipt_outlined, size: 17, color: AppleColors.textPrimary),
               SizedBox(width: 8),
               Text(
                 'Consultation Overview',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppleColors.textPrimary),
               ),
             ],
           ),
@@ -1198,8 +1199,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
           value,
           style: TextStyle(
             fontSize: 12.5,
-            fontWeight: isHighlighted ? FontWeight.w800 : FontWeight.w600,
-            color: isHighlighted ? AppleColors.blue : AppleColors.textPrimary,
+            fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.w600,
+            color: isHighlighted ? AppleColors.brand : AppleColors.textPrimary,
           ),
         ),
       ],

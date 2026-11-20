@@ -64,13 +64,12 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('PATIENT PORTAL'), findsOneWidget);
-    expect(find.text('Active'), findsOneWidget);
-    expect(find.textContaining('Welcome, John'), findsOneWidget);
-    expect(find.text('ONLINE APPOINTMENT'), findsOneWidget);
-    expect(find.text('Book Doctor Appointment'), findsOneWidget);
+    expect(find.text('John'), findsOneWidget);
+    expect(find.textContaining('Good '), findsOneWidget);
+    expect(find.text('Book a visit'), findsOneWidget);
+    expect(find.text('See a doctor this week'), findsOneWidget);
     expect(find.text('Next appointment'), findsOneWidget);
-    expect(find.text('Our Doctors'), findsOneWidget);
+    expect(find.text('Our Doctors'), findsWidgets);
     expect(find.textContaining('Dr. Anita Rao'), findsWidgets);
 
     await tester.tap(find.text('Book Appointment').first);

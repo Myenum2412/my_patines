@@ -81,7 +81,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             right: -60,
             child: _AppleGlow(
               size: 300,
-              color: AppleColors.blue.withValues(alpha: 0.10),
+              color: AppleColors.brand.withValues(alpha: 0.10),
             ),
           ),
           SafeArea(
@@ -111,7 +111,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             children: [
                               Icon(
                                 Icons.chevron_left_rounded,
-                                color: AppleColors.blue,
+                                color: AppleColors.brand,
                                 size: 22,
                               ),
                               SizedBox(width: 2),
@@ -120,7 +120,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppleColors.blue,
+                                  color: AppleColors.brand,
                                   letterSpacing: -0.2,
                                 ),
                               ),
@@ -197,12 +197,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppleColors.blueLight,
+                color: AppleColors.brandLight,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Icon(
                 Icons.lock_reset_rounded,
-                color: AppleColors.blue,
+                color: AppleColors.brand,
                 size: 32,
               ),
             ),
@@ -213,7 +213,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 23,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppleColors.textPrimary,
               letterSpacing: -0.5,
               height: 1.2,
@@ -293,7 +293,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: AppleColors.blue,
+                  color: AppleColors.brand,
                   letterSpacing: -0.1,
                 ),
               ),
@@ -316,7 +316,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: AppleColors.textPrimary,
             letterSpacing: -0.4,
           ),
@@ -365,7 +365,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w600,
-                color: AppleColors.blue,
+                color: AppleColors.brand,
               ),
             ),
           ),
@@ -389,7 +389,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       hintText: hint,
       hintStyle: const TextStyle(color: AppleColors.textTertiary, fontSize: 15),
       filled: true,
-      fillColor: const Color(0xFFFBFBFD),
+      fillColor: AppleColors.canvas,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       prefixIcon: Icon(icon, size: 20, color: AppleColors.textSecondary),
       prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 46),
@@ -399,7 +399,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppleColors.blue, width: 1.6),
+        borderSide: const BorderSide(color: AppleColors.brand, width: 1.6),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

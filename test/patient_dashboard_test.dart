@@ -148,8 +148,8 @@ void main() {
     );
 
     await tester.pumpAndSettle();
-    expect(find.text('PATIENT PORTAL'), findsOneWidget);
-    expect(find.textContaining('Welcome, John'), findsOneWidget);
+    expect(find.text('John'), findsOneWidget);
+    expect(find.text('Book a visit'), findsOneWidget);
 
     await tester.tap(find.text('Billing'));
     await tester.pumpAndSettle();

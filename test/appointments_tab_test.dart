@@ -65,14 +65,14 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text("Today's Clinic Tokens"), findsOneWidget);
+    expect(find.text("Today's tokens"), findsOneWidget);
     expect(find.text("Today's Tokens (2)"), findsOneWidget);
     expect(find.text('Completed'), findsWidgets);
-    expect(find.text('Incompleted'), findsWidgets);
+    expect(find.text('Waiting'), findsWidgets);
     expect(find.text('#4'), findsOneWidget);
     expect(find.text('#9'), findsOneWidget);
 
-    await tester.tap(find.text('Incompleted').last);
+    await tester.tap(find.text('Waiting').last);
     await tester.pumpAndSettle();
     expect(find.text('Appointment Token Slip'), findsOneWidget);
     expect(find.text('ASSIGNED TOKEN'), findsOneWidget);

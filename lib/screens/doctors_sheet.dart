@@ -113,7 +113,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
               width: 36,
               height: 4.5,
               decoration: BoxDecoration(
-                color: const Color(0xFFD1D1D6),
+                color: AppleColors.border,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -129,12 +129,12 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppleColors.blueLight,
+                    color: AppleColors.brandLight,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.medical_services_outlined,
-                    color: AppleColors.blue,
+                    color: AppleColors.brand,
                     size: 20,
                   ),
                 ),
@@ -147,7 +147,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                         'Clinic Doctors',
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppleColors.textPrimary,
                           letterSpacing: -0.3,
                         ),
@@ -167,7 +167,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   icon: Container(
                     padding: const EdgeInsets.all(5),
                     decoration: const BoxDecoration(
-                      color: Color(0xFFE5E5EA),
+                      color: AppleColors.border,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.close_rounded, size: 16, color: Color(0xFF48484A)),
@@ -217,7 +217,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
           // Doctors List
           Expanded(
             child: _loading
-                ? const Center(child: CircularProgressIndicator(color: AppleColors.blue))
+                ? const Center(child: CircularProgressIndicator(color: AppleColors.brand))
                 : _filtered.isEmpty
                     ? const Center(
                         child: Text(
@@ -262,7 +262,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppleColors.blue,
+                    color: AppleColors.brand,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   alignment: Alignment.center,
@@ -270,7 +270,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                     initialsOf(doc.name),
                     style: const TextStyle(
                       fontSize: 19,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
@@ -287,7 +287,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                               doc.displayName,
                               style: const TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: AppleColors.textPrimary,
                               ),
                             ),
@@ -300,7 +300,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                         style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF2563EB),
+                          color: AppleColors.brand,
                         ),
                       ),
                       if (doc.qualification != null && doc.qualification!.isNotEmpty)
@@ -324,7 +324,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   _buildPill(
                     Icons.work_outline_rounded,
                     '${doc.experienceYears} Years Exp',
-                    const Color(0xFFF1F5F9),
+                    AppleColors.canvas,
                     const Color(0xFF334155),
                   ),
                 if (doc.hasFee)
@@ -338,8 +338,8 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   _buildPill(
                     Icons.domain_rounded,
                     doc.department!,
-                    const Color(0xFFF8FAFC),
-                    const Color(0xFF64748B),
+                    AppleColors.canvas,
+                    AppleColors.textSecondary,
                   ),
               ],
             ),
@@ -352,7 +352,7 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 11.5,
-                  color: Color(0xFF64748B),
+                  color: AppleColors.textSecondary,
                   height: 1.4,
                 ),
               ),
@@ -363,20 +363,20 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppleColors.canvas,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: AppleColors.border),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.schedule_rounded, size: 14, color: Color(0xFF64748B)),
+                    const Icon(Icons.schedule_rounded, size: 14, color: AppleColors.textSecondary),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         _availabilityLabel(doc),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                        style: const TextStyle(fontSize: 11, color: AppleColors.textSecondary),
                       ),
                     ),
                   ],
@@ -403,8 +403,8 @@ class _DoctorsSheetContentState extends State<_DoctorsSheetContent> {
                   );
                 },
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppleColors.blue,
-                  side: const BorderSide(color: Color(0xFFBFDBFE)),
+                  foregroundColor: AppleColors.brand,
+                  side: const BorderSide(color: AppleColors.brandLight),
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../main.dart' show LoginPage;
 import '../models/patient_session.dart'; // includes SessionStorage
 import '../services/patient_portal_service.dart';
+import '../services/session_manager.dart';
 import '../utils/formatters.dart';
 import '../widgets/app_animations.dart';
 import '../widgets/apple_ui.dart';
@@ -346,7 +347,7 @@ class _ProfileTabState extends State<ProfileTab>
       builder: (dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppRadius.card),
           ),
           title: const Text('Log out?'),
           content: const Text(
@@ -366,7 +367,7 @@ class _ProfileTabState extends State<ProfileTab>
       },
     );
     if (confirmed != true || !mounted) return;
-    await SessionStorage.clear();
+    await SessionManager.instance.logout();
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute<void>(builder: (_) => const LoginPage()),
@@ -406,21 +407,21 @@ class _ProfileTabState extends State<ProfileTab>
           onLogout: _logout,
         ),
         Material(
-          color: Colors.white,
+          color: AppleColors.canvas,
           child: Column(
             children: [
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
-                labelColor: AppleColors.blue,
+                labelColor: AppleColors.brand,
                 unselectedLabelColor: AppleColors.textSecondary,
-                indicatorColor: AppleColors.blue,
+                indicatorColor: AppleColors.brand,
                 indicatorWeight: 2.5,
                 dividerColor: AppleColors.border,
                 labelStyle: const TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: -0.2,
                 ),
                 unselectedLabelStyle: const TextStyle(
@@ -457,7 +458,7 @@ class _ProfileTabState extends State<ProfileTab>
   Widget _tabBody(List<Widget> sections) {
     return RefreshIndicator(
       onRefresh: _refresh,
-      color: const Color(0xFF2196F3),
+      color: AppleColors.brand,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
@@ -467,7 +468,7 @@ class _ProfileTabState extends State<ProfileTab>
           const Center(
             child: Text(
               'Pull down to refresh',
-              style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
             ),
           ),
         ],
@@ -483,7 +484,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.person_outline,
         title: 'Personal details',
-        accent: const Color(0xFF2563EB),
+        accent: AppleColors.brand,
         children: [
           _InfoGrid(
             columns: _editing ? 1 : 2,
@@ -524,7 +525,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.monitor_heart_outlined,
         title: 'Physical & health',
-        accent: const Color(0xFF0F766E),
+        accent: AppleColors.brand,
         children: [
           _InfoGrid(
             columns: _editing ? 1 : 2,
@@ -562,7 +563,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.phone_outlined,
         title: 'Contact channels',
-        accent: const Color(0xFF7C3AED),
+        accent: AppleColors.purple,
         children: [
           _InfoGrid(
             columns: _editing ? 1 : 2,
@@ -593,7 +594,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.home_outlined,
         title: 'Address',
-        accent: const Color(0xFFB45309),
+        accent: AppleColors.orange,
         children: [
           _field(
             'address',
@@ -617,7 +618,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.emergency_outlined,
         title: 'Emergency contact',
-        accent: const Color(0xFFDC2626),
+        accent: AppleColors.red,
         children: [
           _InfoGrid(
             columns: _editing ? 1 : 2,
@@ -701,7 +702,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.shield_outlined,
         title: 'Insurance details',
-        accent: const Color(0xFF15803D),
+        accent: AppleColors.green,
         children: [
           _InfoGrid(
             columns: _editing ? 1 : 2,
@@ -733,14 +734,14 @@ class _ProfileTabState extends State<ProfileTab>
         _SectionCard(
           icon: Icons.local_hospital_outlined,
           title: 'Clinic details',
-          accent: const Color(0xFF4338CA),
+          accent: AppleColors.brandDeep,
           children: [
             Text(
               widget.session.clinicName ?? 'My Clinic',
               style: const TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF0F172A),
+                fontWeight: FontWeight.w600,
+                color: AppleColors.textPrimary,
               ),
             ),
             const SizedBox(height: 6),
@@ -749,7 +750,7 @@ class _ProfileTabState extends State<ProfileTab>
               style: TextStyle(
                 fontSize: 12.5,
                 height: 1.45,
-                color: Color(0xFF64748B),
+                color: AppleColors.textSecondary,
               ),
             ),
           ],
@@ -765,7 +766,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.local_hospital_outlined,
         title: 'Clinic overview',
-        accent: const Color(0xFF4338CA),
+        accent: AppleColors.brandDeep,
         children: [
           _InfoGrid(
             columns: 2,
@@ -791,7 +792,7 @@ class _ProfileTabState extends State<ProfileTab>
       _SectionCard(
         icon: Icons.contact_phone_outlined,
         title: 'Contact & location',
-        accent: const Color(0xFF2563EB),
+        accent: AppleColors.brand,
         children: [
           _InfoGrid(
             columns: 2,
@@ -952,7 +953,7 @@ class _ProfileHeader extends StatelessWidget {
     final active = patient.status.toLowerCase() == 'active';
     return Container(
       width: double.infinity,
-      color: Colors.white,
+      color: AppleColors.canvas,
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -981,8 +982,9 @@ class _ProfileHeader extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                        fontFamily: AppType.displayFamily,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: -0.5,
                         color: AppleColors.textPrimary,
                       ),
@@ -1005,7 +1007,7 @@ class _ProfileHeader extends StatelessWidget {
                             active ? 'Active Patient' : 'Inactive',
                             style: TextStyle(
                               fontSize: 10.5,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: active
                                   ? AppleColors.green
                                   : AppleColors.textSecondary,
@@ -1045,7 +1047,7 @@ class _ProfileHeader extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppleColors.blueLight,
+                        color: AppleColors.brandLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       alignment: Alignment.center,
@@ -1055,15 +1057,15 @@ class _ProfileHeader extends StatelessWidget {
                           Icon(
                             Icons.edit_rounded,
                             size: 14,
-                            color: AppleColors.blue,
+                            color: AppleColors.brand,
                           ),
                           SizedBox(width: 4),
                           Text(
                             'Edit Profile',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: AppleColors.blue,
+                              fontWeight: FontWeight.w600,
+                              color: AppleColors.brand,
                               letterSpacing: -0.1,
                             ),
                           ),
@@ -1104,7 +1106,7 @@ class _ProfileHeader extends StatelessWidget {
                             'Avatar',
                             style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: AppleColors.textPrimary,
                               letterSpacing: -0.1,
                             ),
@@ -1139,7 +1141,7 @@ class _ProfileHeader extends StatelessWidget {
                           'Logout',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w700,
+                            fontWeight: FontWeight.w600,
                             color: AppleColors.red,
                           ),
                         ),
@@ -1182,7 +1184,7 @@ class _ProfileHeader extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: AppleColors.blue,
+                        color: AppleColors.brand,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       alignment: Alignment.center,
@@ -1211,7 +1213,7 @@ class _ProfileHeader extends StatelessWidget {
                             saving ? 'Saving...' : 'Save',
                             style: const TextStyle(
                               fontSize: 12.5,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                           ),
@@ -1307,7 +1309,7 @@ class _HeaderStat extends StatelessWidget {
           style: const TextStyle(
             fontSize: 9.5,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF64748B),
+            color: AppleColors.textSecondary,
           ),
         ),
         const SizedBox(height: 2),
@@ -1317,8 +1319,8 @@ class _HeaderStat extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(
             fontSize: 12.5,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF0F172A),
+            fontWeight: FontWeight.w600,
+            color: AppleColors.textPrimary,
           ),
         ),
       ],
@@ -1335,7 +1337,7 @@ class _HeaderDivider extends StatelessWidget {
       width: 1,
       height: 26,
       margin: const EdgeInsets.symmetric(horizontal: 10),
-      color: const Color(0xFFE0E7FF),
+      color: AppleColors.brandLight,
     );
   }
 }
@@ -1352,7 +1354,7 @@ class _HeaderContactLine extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: const Color(0xFF6366F1)),
+          Icon(icon, size: 15, color: AppleColors.textTertiary),
           const SizedBox(width: 7),
           Expanded(
             child: Text(
@@ -1361,7 +1363,7 @@ class _HeaderContactLine extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 11.5,
-                color: Color(0xFF475569),
+                color: AppleColors.textSecondary,
               ),
             ),
           ),
@@ -1376,7 +1378,7 @@ class _SectionCard extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.children,
-    this.accent = AppleColors.blue,
+    this.accent = AppleColors.brand,
   });
 
   final IconData icon;
@@ -1391,7 +1393,7 @@ class _SectionCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppleColors.border, width: 0.8),
         boxShadow: AppleColors.cardShadow,
       ),
@@ -1414,7 +1416,7 @@ class _SectionCard extends StatelessWidget {
                 title,
                 style: const TextStyle(
                   fontSize: 14.5,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: AppleColors.textPrimary,
                   letterSpacing: -0.2,
                 ),
@@ -1468,12 +1470,11 @@ class _InfoField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
+          label,
           style: const TextStyle(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.4,
-            color: Color(0xFF94A3B8),
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+            color: AppleColors.textTertiary,
           ),
         ),
         const SizedBox(height: 3),
@@ -1483,7 +1484,7 @@ class _InfoField extends StatelessWidget {
             fontSize: 13.5,
             height: 1.4,
             fontWeight: FontWeight.w500,
-            color: Color(0xFF0F172A),
+            color: AppleColors.textPrimary,
           ),
         ),
       ],
@@ -1524,28 +1525,28 @@ class _EditField extends StatelessWidget {
       onTap: onTap,
       onChanged: onChanged,
       textCapitalization: TextCapitalization.words,
-      style: const TextStyle(fontSize: 13.5, color: Color(0xFF0F172A)),
+      style: const TextStyle(fontSize: 13.5, color: AppleColors.textPrimary),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         errorText: errorText,
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: AppleColors.canvas,
         isDense: true,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-        labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+        labelStyle: const TextStyle(fontSize: 12.5, color: AppleColors.textSecondary),
         floatingLabelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF2196F3),
+          color: AppleColors.brand,
         ),
-        hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)),
+        hintStyle: const TextStyle(fontSize: 12.5, color: AppleColors.textTertiary),
         suffixIcon: readOnly
             ? const Icon(
                 Icons.calendar_today_outlined,
                 size: 17,
-                color: Color(0xFF94A3B8),
+                color: AppleColors.textTertiary,
               )
             : null,
         suffixIconConstraints: const BoxConstraints(
@@ -1554,25 +1555,25 @@ class _EditField extends StatelessWidget {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppleColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppleColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF2196F3), width: 1.4),
+          borderSide: const BorderSide(color: AppleColors.brand, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFEF4444)),
+          borderSide: const BorderSide(color: AppleColors.red),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFEF4444), width: 1.4),
+          borderSide: const BorderSide(color: AppleColors.red, width: 1.4),
         ),
-        errorStyle: const TextStyle(fontSize: 11, color: Color(0xFFEF4444)),
+        errorStyle: const TextStyle(fontSize: 11, color: AppleColors.red),
       ),
     );
   }
@@ -1599,28 +1600,28 @@ class _DropdownField extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: AppleColors.canvas,
         isDense: true,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-        labelStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+        labelStyle: const TextStyle(fontSize: 12.5, color: AppleColors.textSecondary),
         floatingLabelStyle: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF2196F3),
+          color: AppleColors.brand,
         ),
-        hintStyle: const TextStyle(fontSize: 12.5, color: Color(0xFF94A3B8)),
+        hintStyle: const TextStyle(fontSize: 12.5, color: AppleColors.textTertiary),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppleColors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: const BorderSide(color: AppleColors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Color(0xFF2196F3), width: 1.4),
+          borderSide: const BorderSide(color: AppleColors.brand, width: 1.4),
         ),
       ),
       hint: Text('Select ${label.toLowerCase()}'),
@@ -1649,9 +1650,9 @@ class _StatusNote extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppleColors.canvas,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppleColors.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1659,7 +1660,7 @@ class _StatusNote extends StatelessWidget {
           const Icon(
             Icons.info_outline_rounded,
             size: 16,
-            color: Color(0xFF64748B),
+            color: AppleColors.textSecondary,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -1668,7 +1669,7 @@ class _StatusNote extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11.5,
                 height: 1.45,
-                color: Color(0xFF64748B),
+                color: AppleColors.textSecondary,
               ),
             ),
           ),
@@ -1694,7 +1695,7 @@ class _ProfileError extends StatelessWidget {
         const Icon(
           Icons.person_off_outlined,
           size: 52,
-          color: Color(0xFF94A3B8),
+          color: AppleColors.textTertiary,
         ),
         const SizedBox(height: 16),
         Text(
@@ -1703,7 +1704,7 @@ class _ProfileError extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             height: 1.45,
-            color: Color(0xFF475569),
+            color: AppleColors.textSecondary,
           ),
         ),
         const SizedBox(height: 20),

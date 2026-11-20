@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../config/app_config.dart';
 import '../models/patient_session.dart';
+import 'session_manager.dart';
 
 /// Thrown when the patient's medical records cannot be loaded.
 class RecordsException implements Exception {
@@ -252,7 +253,13 @@ class RecordsService {
     }
   }
 
-  Future<Map<String, dynamic>> _getJson(String path) async {
+  Future<Map<String, dynamic>> _getJson(
+    String path, {
+    bool authRetried = false,
+  }) async {
+    if (SessionManager.instance.isSignedIn) {
+      await SessionManager.instance.maybeRefresh();
+    }
     final uri = Uri.parse('${AppConfig.backendUrl}$path');
     final http.Response response;
     try {
@@ -261,7 +268,8 @@ class RecordsService {
             uri,
             headers: {
               'Accept': 'application/json',
-              'Authorization': 'Bearer ${session.token}',
+              'Authorization':
+                  'Bearer ${SessionManager.instance.tokenFor(session)}',
             },
           )
           .timeout(const Duration(seconds: 60));
@@ -292,8 +300,15 @@ class RecordsService {
 
     final status = response.statusCode;
     if (status == 401) {
+      // Try to slide the session and replay once before giving up.
+      if (!authRetried && SessionManager.instance.isSignedIn) {
+        final refreshed = await SessionManager.instance.refresh();
+        if (refreshed != null) {
+          return _getJson(path, authRetried: true);
+        }
+      }
       throw const RecordsException(
-        'Your session has expired. Please log out and sign in again.',
+        'Your session has expired. Please sign in again.',
         statusCode: 401,
       );
     }

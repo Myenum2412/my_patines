@@ -144,3 +144,12 @@ String formatDateTime(Object? value, {String fallback = 'Not available'}) {
   final mm = local.minute.toString().padLeft(2, '0');
   return '${formatDate(local)}, ${formatTime('$hh:$mm')}';
 }
+
+/// Prefixes "Dr." to a doctor's name unless the name already carries it.
+String doctorTitle(String? name) {
+  final clean = (name ?? '').trim();
+  if (clean.isEmpty) return 'Doctor';
+  final lower = clean.toLowerCase();
+  if (lower.startsWith('dr.') || lower.startsWith('dr ')) return clean;
+  return 'Dr. $clean';
+}

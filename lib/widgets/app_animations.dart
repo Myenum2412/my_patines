@@ -353,9 +353,9 @@ class _SkeletonLoaderState extends State<SkeletonLoader>
                 begin: Alignment(x - 1, -0.3),
                 end: Alignment(x + 1, 0.3),
                 colors: const [
-                  Color(0xFFE8E8ED),
-                  Color(0xFFF7F7FA),
-                  Color(0xFFE8E8ED),
+                  AppleColors.border,
+                  AppleColors.groupedBackground,
+                  AppleColors.border,
                 ],
               ).createShader(bounds),
               child: child,
@@ -528,6 +528,91 @@ class ShakeOnErrorState extends State<ShakeOnError>
         );
       },
       child: widget.child,
+    );
+  }
+}
+
+/// Passes one soft band of light across [child] once, a beat after it
+/// appears: the hero's entrance. It never repeats, and under reduced motion
+/// it does not play at all.
+class OneShotSheen extends StatefulWidget {
+  const OneShotSheen({
+    super.key,
+    required this.child,
+    this.borderRadius = BorderRadius.zero,
+    this.delay = const Duration(milliseconds: 380),
+  });
+
+  final Widget child;
+  final BorderRadius borderRadius;
+  final Duration delay;
+
+  @override
+  State<OneShotSheen> createState() => _OneShotSheenState();
+}
+
+class _OneShotSheenState extends State<OneShotSheen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  );
+  bool _started = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_started) return;
+    _started = true;
+    if (reduceMotionOf(context)) {
+      _controller.value = 1;
+      return;
+    }
+    Future<void>.delayed(widget.delay, () {
+      if (mounted) _controller.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        Positioned.fill(
+          child: IgnorePointer(
+            child: ClipRRect(
+              borderRadius: widget.borderRadius,
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  final t = Motion.easeTravel.transform(_controller.value);
+                  if (t <= 0 || t >= 1) return const SizedBox.shrink();
+                  final x = -1.6 + 3.2 * t;
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment(x - 0.5, -1),
+                        end: Alignment(x + 0.5, 1),
+                        colors: const [
+                          Color(0x00FFFFFF),
+                          Color(0x2EFFFFFF),
+                          Color(0x00FFFFFF),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

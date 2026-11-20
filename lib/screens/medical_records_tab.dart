@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/patient_session.dart';
 import '../services/records_service.dart';
 import '../widgets/app_animations.dart';
+import '../utils/formatters.dart';
 import '../widgets/apple_ui.dart';
 import '../widgets/details_sheet.dart';
 import 'file_viewer_page.dart';
@@ -151,7 +152,7 @@ class _RecordsBodyState extends State<_RecordsBody> {
     if (data.isEmpty) {
       return RefreshIndicator(
         onRefresh: widget.onRefresh,
-        color: const Color(0xFF2196F3),
+        color: AppleColors.brand,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
           children: const [
@@ -161,7 +162,7 @@ class _RecordsBodyState extends State<_RecordsBody> {
             Center(
               child: Text(
                 'Pull down to refresh',
-                style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
               ),
             ),
           ],
@@ -174,16 +175,16 @@ class _RecordsBodyState extends State<_RecordsBody> {
       child: Column(
         children: [
           Material(
-            color: Colors.white,
+            color: AppleColors.canvas,
             child: TabBar(
-              labelColor: AppleColors.blue,
+              labelColor: AppleColors.brand,
               unselectedLabelColor: AppleColors.textSecondary,
-              indicatorColor: AppleColors.blue,
+              indicatorColor: AppleColors.brand,
               indicatorWeight: 2.5,
               dividerColor: AppleColors.border,
               labelStyle: const TextStyle(
                 fontSize: 13.5,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 letterSpacing: -0.2,
               ),
               unselectedLabelStyle: const TextStyle(
@@ -283,7 +284,7 @@ class _TimelineViewState extends State<_TimelineView> {
     var revealIndex = 0;
     final content = RefreshIndicator(
       onRefresh: widget.onRefresh,
-      color: const Color(0xFF2196F3),
+      color: AppleColors.brand,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 28),
@@ -316,7 +317,7 @@ class _TimelineViewState extends State<_TimelineView> {
               child: Center(
                 child: Text(
                   'Nothing in this filter yet.',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 14, color: AppleColors.textSecondary),
                 ),
               ),
             ),
@@ -326,15 +327,15 @@ class _TimelineViewState extends State<_TimelineView> {
                 const Icon(
                   Icons.calendar_today_outlined,
                   size: 14,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                 ),
                 const SizedBox(width: 6),
                 Text(
                   group.key,
                   style: const TextStyle(
                     fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.w600,
+                    color: AppleColors.textSecondary,
                     letterSpacing: 0.2,
                   ),
                 ),
@@ -355,7 +356,7 @@ class _TimelineViewState extends State<_TimelineView> {
                             Expanded(
                               child: Container(
                                 width: 2,
-                                color: const Color(0xFFE2E8F0),
+                                color: AppleColors.border,
                               ),
                             ),
                             Container(
@@ -364,14 +365,14 @@ class _TimelineViewState extends State<_TimelineView> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: event.isRecord
-                                    ? const Color(0xFF2196F3)
-                                    : const Color(0xFFF59E0B),
+                                    ? AppleColors.brand
+                                    : AppleColors.orange,
                               ),
                             ),
                             Expanded(
                               child: Container(
                                 width: 2,
-                                color: const Color(0xFFE2E8F0),
+                                color: AppleColors.border,
                               ),
                             ),
                           ],
@@ -384,14 +385,14 @@ class _TimelineViewState extends State<_TimelineView> {
                           child: event.isRecord
                               ? _TimelineCard(
                                   icon: Icons.medical_information_outlined,
-                                  iconColor: const Color(0xFF0284C7),
-                                  iconBackground: const Color(0xFFE0F2FE),
+                                  iconColor: AppleColors.brand,
+                                  iconBackground: AppleColors.brandLight,
                                   badge: 'Visit',
                                   title: _recordTitle(event.record!),
                                   subtitle: _recordSubtitle(event.record!),
                                   trailing: const Icon(
                                     Icons.chevron_right,
-                                    color: Color(0xFF94A3B8),
+                                    color: AppleColors.textTertiary,
                                   ),
                                   onTap: () =>
                                       widget.onOpenRecord(event.record!),
@@ -415,7 +416,7 @@ class _TimelineViewState extends State<_TimelineView> {
                                         )
                                       : const Icon(
                                           Icons.play_circle_outline_rounded,
-                                          color: Color(0xFF2196F3),
+                                          color: AppleColors.brand,
                                         ),
                                   onTap: () => widget.onOpenFile(event.file!),
                                 ),
@@ -431,7 +432,7 @@ class _TimelineViewState extends State<_TimelineView> {
           const Center(
             child: Text(
               'Pull down to refresh',
-              style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
             ),
           ),
         ],
@@ -460,7 +461,7 @@ class _FilesView extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: onRefresh,
-      color: const Color(0xFF2196F3),
+      color: AppleColors.brand,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
@@ -473,7 +474,7 @@ class _FilesView extends StatelessWidget {
           const SizedBox(height: 4),
           const Text(
             'Tap a file to view it, stream it, or download it.',
-            style: TextStyle(fontSize: 12.5, color: Color(0xFF64748B)),
+            style: TextStyle(fontSize: 12.5, color: AppleColors.textSecondary),
           ),
           const SizedBox(height: 12),
           if (groups.isEmpty)
@@ -482,7 +483,7 @@ class _FilesView extends StatelessWidget {
               child: Center(
                 child: Text(
                   'No documents uploaded yet.',
-                  style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 14, color: AppleColors.textSecondary),
                 ),
               ),
             ),
@@ -498,7 +499,7 @@ class _FilesView extends StatelessWidget {
           const Center(
             child: Text(
               'Pull down to refresh',
-              style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+              style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
             ),
           ),
         ],
@@ -538,10 +539,10 @@ class _FilterChip extends StatelessWidget {
         curve: Motion.ease,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF2196F3) : Colors.white,
+          color: selected ? AppleColors.brand : Colors.white,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected ? const Color(0xFF2196F3) : const Color(0xFFE2E8F0),
+            color: selected ? AppleColors.brand : AppleColors.border,
           ),
         ),
         child: Text(
@@ -549,7 +550,7 @@ class _FilterChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            color: selected ? Colors.white : const Color(0xFF475569),
+            color: selected ? Colors.white : AppleColors.textSecondary,
           ),
         ),
       ),
@@ -586,7 +587,7 @@ class _TimelineCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppleColors.border, width: 0.8),
           boxShadow: AppleColors.cardShadow,
         ),
@@ -608,11 +609,10 @@ class _TimelineCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    badge.toUpperCase(),
+                    badge,
                     style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                       color: iconColor,
                     ),
                   ),
@@ -623,7 +623,7 @@ class _TimelineCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: AppleColors.textPrimary,
                       letterSpacing: -0.2,
                     ),
@@ -673,19 +673,19 @@ class _FolderCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        side: const BorderSide(color: AppleColors.border),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-            color: const Color(0xFFF8FAFC),
+            color: AppleColors.canvas,
             child: Row(
               children: [
                 const Icon(
                   Icons.folder_outlined,
                   size: 20,
-                  color: Color(0xFFF59E0B),
+                  color: AppleColors.orange,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -703,14 +703,14 @@ class _FolderCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
+                    color: AppleColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
           for (var i = 0; i < group.files.length; i++) ...[
-            if (i > 0) const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            if (i > 0) const Divider(height: 1, color: AppleColors.border),
             _FileTile(
               file: group.files[i],
               isOpening: openingFileId == group.files[i].fileId,
@@ -766,7 +766,7 @@ class _FileTile extends StatelessWidget {
         meta.join(' · '),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+        style: const TextStyle(fontSize: 12, color: AppleColors.textSecondary),
       ),
       trailing: isOpening
           ? const SizedBox(
@@ -777,7 +777,7 @@ class _FileTile extends StatelessWidget {
           : const Icon(
               Icons.play_circle_outline_rounded,
               size: 21,
-              color: Color(0xFF2196F3),
+              color: AppleColors.brand,
             ),
     );
   }
@@ -798,13 +798,13 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: const Color(0xFF2196F3)),
+        Icon(icon, size: 18, color: AppleColors.brand),
         const SizedBox(width: 8),
         Text(
           title,
           style: const TextStyle(
             fontSize: 15,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
         ),
@@ -812,7 +812,7 @@ class _SectionHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: const Color(0xFFE0F2FE),
+            color: AppleColors.brandLight,
             borderRadius: BorderRadius.circular(999),
           ),
           child: Text(
@@ -820,7 +820,7 @@ class _SectionHeader extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0284C7),
+              color: AppleColors.brand,
             ),
           ),
         ),
@@ -841,15 +841,16 @@ class _EmptyView extends StatelessWidget {
           Icon(
             Icons.folder_open_outlined,
             size: 56,
-            color: Color(0xFF2196F3),
+            color: AppleColors.brand,
           ),
           SizedBox(height: 16),
           Text(
             'No medical records yet',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
+              fontFamily: AppType.displayFamily,
+              fontSize: 19,
+              fontWeight: FontWeight.w500,
               color: Colors.black,
             ),
           ),
@@ -859,7 +860,7 @@ class _EmptyView extends StatelessWidget {
             child: Text(
               'Records and documents added by your clinic will appear here automatically.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Color(0xFF475569)),
+              style: TextStyle(fontSize: 14, color: AppleColors.textSecondary),
             ),
           ),
         ],
@@ -886,13 +887,13 @@ class _ErrorView extends StatelessWidget {
             width: 68,
             height: 68,
             decoration: const BoxDecoration(
-              color: AppleColors.blueLight,
+              color: AppleColors.brandLight,
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.folder_shared_outlined,
               size: 32,
-              color: AppleColors.blue,
+              color: AppleColors.brand,
             ),
           ),
         ),
@@ -914,7 +915,7 @@ class _ErrorView extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
               decoration: BoxDecoration(
-                color: AppleColors.blue,
+                color: AppleColors.brand,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Row(
@@ -926,7 +927,7 @@ class _ErrorView extends StatelessWidget {
                     'Try again',
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
@@ -992,12 +993,12 @@ void _showRecordDetails(BuildContext context, MedicineRecordEntry record) {
         : 'Medical Record',
     subtitle: _formatDate(record.visitDate),
     icon: Icons.folder_shared_outlined,
-    accent: const Color(0xFF2563EB),
+    accent: AppleColors.brand,
     children: [
       DetailSection(
         title: 'Clinical Summary',
         icon: Icons.medical_information_outlined,
-        accent: const Color(0xFF2563EB),
+        accent: AppleColors.brand,
         children: [
           DetailField(
             label: 'Diagnosis',
@@ -1035,7 +1036,7 @@ String _recordSubtitle(MedicineRecordEntry record) {
   final parts = <String>[
     'Visit',
     if ((record.doctorName ?? '').trim().isNotEmpty)
-      'Dr. ${record.doctorName!.trim()}',
+      doctorTitle(record.doctorName),
     _formatDate(record.visitDate),
   ];
   final preview = (record.treatment ?? record.symptoms ?? '').trim();
@@ -1111,16 +1112,16 @@ IconData _fileIcon(String? mimeType) {
 
 Color _iconColor(String? mimeType) {
   final mime = (mimeType ?? '').toLowerCase();
-  if (mime.startsWith('image/')) return const Color(0xFF0284C7);
-  if (mime == 'application/pdf') return const Color(0xFFDC2626);
-  if (mime.startsWith('video/')) return const Color(0xFF7C3AED);
-  return const Color(0xFF0F766E);
+  if (mime.startsWith('image/')) return AppleColors.brand;
+  if (mime == 'application/pdf') return AppleColors.red;
+  if (mime.startsWith('video/')) return AppleColors.purple;
+  return AppleColors.brand;
 }
 
 Color _iconBackground(String? mimeType) {
   final mime = (mimeType ?? '').toLowerCase();
-  if (mime.startsWith('image/')) return const Color(0xFFE0F2FE);
-  if (mime == 'application/pdf') return const Color(0xFFFEE2E2);
-  if (mime.startsWith('video/')) return const Color(0xFFEDE9FE);
-  return const Color(0xFFCCFBF1);
+  if (mime.startsWith('image/')) return AppleColors.brandLight;
+  if (mime == 'application/pdf') return AppleColors.redLight;
+  if (mime.startsWith('video/')) return AppleColors.purpleLight;
+  return AppleColors.brandLight;
 }

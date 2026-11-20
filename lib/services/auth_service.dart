@@ -4,12 +4,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../config/app_config.dart';
+import '../models/patient_session.dart' show jwtExpiry;
 
 class AuthResult {
   const AuthResult({
     required this.success,
     this.message,
     this.token,
+    this.expiresAt,
     this.data,
     this.statusCode,
   });
@@ -17,6 +19,9 @@ class AuthResult {
   final bool success;
   final String? message;
   final String? token;
+
+  /// When [token] stops being valid, when the server tells us.
+  final DateTime? expiresAt;
   final Map<String, dynamic>? data;
   final int? statusCode;
 }
@@ -41,10 +46,12 @@ class AuthService {
     );
     if (!result.success) return result;
 
+    final token = _extractToken(result.data);
     return AuthResult(
       success: true,
       message: result.message,
-      token: _extractToken(result.data),
+      token: token,
+      expiresAt: _extractExpiry(result.data, token),
       data: result.data,
       statusCode: result.statusCode,
     );
@@ -146,6 +153,26 @@ class AuthService {
     if (data is Map<String, dynamic>) {
       return _extractToken(data);
     }
+    return null;
+  }
+
+  /// Prefers the server-provided TTL, falls back to the JWT `exp` claim.
+  DateTime? _extractExpiry(Map<String, dynamic>? body, String? token) {
+    final ttl = _extractTtl(body);
+    if (ttl != null && ttl > 0) {
+      return DateTime.now().add(Duration(seconds: ttl));
+    }
+    return token == null ? null : jwtExpiry(token);
+  }
+
+  int? _extractTtl(Map<String, dynamic>? body) {
+    if (body == null) return null;
+    final value = body['tokenExpiresInSeconds'] ?? body['expiresInSeconds'];
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value.trim());
+    final data = body['data'];
+    if (data is Map<String, dynamic>) return _extractTtl(data);
     return null;
   }
 

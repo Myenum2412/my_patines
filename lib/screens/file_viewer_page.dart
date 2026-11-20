@@ -1,6 +1,7 @@
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../widgets/apple_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:pdfx/pdfx.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -212,7 +213,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF0B1220),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: AppleColors.textPrimary,
         foregroundColor: Colors.white,
         titleSpacing: 4,
         title: Text(
@@ -283,7 +284,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
                 value: total == null
                     ? null
                     : progress.cumulativeBytesLoaded / total,
-                color: const Color(0xFF60A5FA),
+                color: AppleColors.brandOnDark,
               ),
             );
           },
@@ -302,7 +303,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
   Widget _buildPdf() {
     if (_pdfLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF60A5FA)),
+        child: CircularProgressIndicator(color: AppleColors.brandOnDark),
       );
     }
     if (_pdfError != null || _pdfController == null) {
@@ -346,7 +347,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
   Widget _buildVideo() {
     if (_videoLoading) {
       return const Center(
-        child: CircularProgressIndicator(color: Color(0xFF60A5FA)),
+        child: CircularProgressIndicator(color: AppleColors.brandOnDark),
       );
     }
     final controller = _videoController;
@@ -394,9 +395,9 @@ class _FileViewerPageState extends State<FileViewerPage> {
                             controller,
                             allowScrubbing: true,
                             colors: const VideoProgressColors(
-                              playedColor: Color(0xFF60A5FA),
+                              playedColor: AppleColors.brandOnDark,
                               bufferedColor: Color(0xFF334155),
-                              backgroundColor: Color(0xFF1E293B),
+                              backgroundColor: AppleColors.textPrimary,
                             ),
                           ),
                         ),
@@ -407,7 +408,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
                       '${_formatDuration(value.position)} / ${_formatDuration(value.duration)}',
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFFCBD5E1),
+                        color: AppleColors.border,
                       ),
                     ),
                   ],
@@ -430,7 +431,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
             const Icon(
               Icons.insert_drive_file_outlined,
               size: 56,
-              color: Color(0xFF94A3B8),
+              color: AppleColors.textTertiary,
             ),
             const SizedBox(height: 16),
             Text(
@@ -449,7 +450,7 @@ class _FileViewerPageState extends State<FileViewerPage> {
               style: TextStyle(
                 fontSize: 13.5,
                 height: 1.45,
-                color: Color(0xFFCBD5E1),
+                color: AppleColors.border,
               ),
             ),
             const SizedBox(height: 22),
@@ -550,12 +551,12 @@ class _ViewerMessage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 52, color: const Color(0xFF94A3B8)),
+            Icon(icon, size: 52, color: AppleColors.textTertiary),
             const SizedBox(height: 14),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, color: Color(0xFFCBD5E1)),
+              style: const TextStyle(fontSize: 14, color: AppleColors.border),
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
@@ -563,7 +564,7 @@ class _ViewerMessage extends StatelessWidget {
                 onPressed: onRetry,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  side: const BorderSide(color: Color(0xFF475569)),
+                  side: const BorderSide(color: AppleColors.textSecondary),
                 ),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Try again'),

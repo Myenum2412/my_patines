@@ -150,7 +150,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
       children: [
         RefreshIndicator(
           onRefresh: refresh,
-          color: AppleColors.blue,
+          color: AppleColors.brand,
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 92),
@@ -192,9 +192,8 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               if (data.upcomingAppointments.isNotEmpty)
                 _NextAppointmentCard(
                   appointment: data.upcomingAppointments.first,
-                  onTap: () => _showAppointmentDetails(
-                    data.upcomingAppointments.first,
-                  ),
+                  onTap: () =>
+                      _showAppointmentDetails(data.upcomingAppointments.first),
                   onBookAnother: _openBookAppointment,
                 )
               else
@@ -250,7 +249,10 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
               const Center(
                 child: Text(
                   'Pull down to refresh',
-                  style: TextStyle(fontSize: 12, color: AppleColors.textTertiary),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: AppleColors.textTertiary,
+                  ),
                 ),
               ),
             ]),
@@ -279,11 +281,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
         if (section is SizedBox)
           section
         else
-          StaggeredReveal(
-            animation: _reveal,
-            index: index++,
-            child: section,
-          ),
+          StaggeredReveal(animation: _reveal, index: index++, child: section),
     ];
   }
 
@@ -312,7 +310,8 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
     showDetailsSheet(
       context: context,
       title: 'Appointments',
-      subtitle: '${appointments.length} visit${appointments.length == 1 ? '' : 's'} on record',
+      subtitle:
+          '${appointments.length} visit${appointments.length == 1 ? '' : 's'} on record',
       icon: Icons.calendar_month_outlined,
       footer: SizedBox(
         width: double.infinity,
@@ -322,7 +321,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
             _openBookAppointment();
           },
           style: FilledButton.styleFrom(
-            backgroundColor: AppleColors.blue,
+            backgroundColor: AppleColors.brand,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 13),
             shape: RoundedRectangleBorder(
@@ -332,7 +331,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
           icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
           label: const Text(
             'Book New Appointment',
-            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
+            style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -352,7 +351,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                   ),
                 ),
                 if (i != appointments.length - 1)
-                  const Divider(height: 18, color: Color(0xFFF1F5F9)),
+                  const Divider(height: 18, color: AppleColors.canvas),
               ],
             ],
     );
@@ -367,7 +366,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
       subtitle:
           '${formatDate(appointment.date)} · ${formatTime(appointment.time)}',
       icon: Icons.calendar_month_outlined,
-      accent: const Color(0xFF2563EB),
+      accent: AppleColors.brand,
       children: [
         Wrap(
           spacing: 8,
@@ -376,23 +375,23 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
             StatusPill(
               label: formatStatus(appointment.status),
               color: appointment.isUpcoming
-                  ? const Color(0xFF2563EB)
-                  : const Color(0xFF64748B),
+                  ? AppleColors.brand
+                  : AppleColors.textSecondary,
               background: appointment.isUpcoming
-                  ? const Color(0xFFDBEAFE)
-                  : const Color(0xFFF1F5F9),
+                  ? AppleColors.brandLight
+                  : AppleColors.canvas,
             ),
             if (appointment.tokenNumber != null)
               StatusPill(
                 label: 'Token #${appointment.tokenNumber}',
-                color: const Color(0xFF0F766E),
-                background: const Color(0xFFCCFBF1),
+                color: AppleColors.brand,
+                background: AppleColors.brandLight,
               ),
             if (appointment.priority)
               const StatusPill(
                 label: 'Priority',
-                color: Color(0xFFB45309),
-                background: Color(0xFFFEF3C7),
+                color: AppleColors.orange,
+                background: AppleColors.orangeLight,
               ),
           ],
         ),
@@ -447,15 +446,14 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
   }
 
   void _showPrescriptionsSheet() {
-    final prescriptions =
-        _data?.prescriptions ?? const <PrescriptionEntry>[];
+    final prescriptions = _data?.prescriptions ?? const <PrescriptionEntry>[];
     showDetailsSheet(
       context: context,
       title: 'Prescriptions',
       subtitle:
           '${prescriptions.length} prescription${prescriptions.length == 1 ? '' : 's'} on record',
       icon: Icons.medication_outlined,
-      accent: const Color(0xFF0F766E),
+      accent: AppleColors.brand,
       children: prescriptions.isEmpty
           ? [
               const _SheetEmpty(
@@ -472,7 +470,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
                   ),
                 ),
                 if (i != prescriptions.length - 1)
-                  const Divider(height: 18, color: Color(0xFFF1F5F9)),
+                  const Divider(height: 18, color: AppleColors.canvas),
               ],
             ],
     );
@@ -484,16 +482,14 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
       title: (prescription.diagnosis ?? '').trim().isNotEmpty
           ? prescription.diagnosis!.trim()
           : 'Prescription',
-      subtitle: formatDate(
-        prescription.visitDate ?? prescription.createdAt,
-      ),
+      subtitle: formatDate(prescription.visitDate ?? prescription.createdAt),
       icon: Icons.medication_outlined,
-      accent: const Color(0xFF0F766E),
+      accent: AppleColors.brand,
       children: [
         DetailSection(
           title: 'Visit details',
           icon: Icons.medical_information_outlined,
-          accent: const Color(0xFF0F766E),
+          accent: AppleColors.brand,
           children: [
             DetailField(
               label: 'Doctor',
@@ -519,7 +515,7 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
           const DetailSectionTitle(
             title: 'Medicines',
             icon: Icons.medication_liquid_outlined,
-            accent: Color(0xFF0F766E),
+            accent: AppleColors.brand,
           ),
           for (final medicine in prescription.medicines) ...[
             _MedicineCard(medicine: medicine),
@@ -531,10 +527,8 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
           DetailSection(
             title: 'Notes',
             icon: Icons.notes_outlined,
-            accent: const Color(0xFF0F766E),
-            children: [
-              DetailField(label: 'Notes', value: prescription.notes!),
-            ],
+            accent: AppleColors.brand,
+            children: [DetailField(label: 'Notes', value: prescription.notes!)],
           ),
       ],
     );
@@ -542,12 +536,9 @@ class HomeTabState extends State<HomeTab> with SingleTickerProviderStateMixin {
 
   void _openFromSheet(VoidCallback openDetails) {
     Navigator.of(context).pop();
-    Future<void>.delayed(
-      const Duration(milliseconds: 240),
-      () {
-        if (mounted) openDetails();
-      },
-    );
+    Future<void>.delayed(const Duration(milliseconds: 240), () {
+      if (mounted) openDetails();
+    });
   }
 }
 
@@ -566,173 +557,72 @@ class _WelcomeCard extends StatelessWidget {
   final String fullName;
   final VoidCallback? onTapAvatar;
 
+  static String _greeting(DateTime now) {
+    if (now.hour < 12) return 'Good morning';
+    if (now.hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 20, 18, 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppleColors.border, width: 0.8),
-        boxShadow: AppleColors.cardShadow,
-      ),
-      child: Stack(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Positioned(
-            top: -20,
-            right: -20,
-            child: IgnorePointer(
-              child: Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppleColors.blueLight.withValues(alpha: 0.6),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${_greeting(DateTime.now())},',
+                  style: AppType.lead.copyWith(
+                    color: AppleColors.textSecondary,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 2),
+                Text(
+                  firstName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppType.display,
+                ),
+                if (clinicName.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: const BoxDecoration(
+                          color: AppleColors.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          clinicName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppType.small,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
             ),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppleColors.blueLight,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.health_and_safety_rounded,
-                                size: 13,
-                                color: AppleColors.blue,
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                'PATIENT PORTAL',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.8,
-                                  color: AppleColors.blue,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 7,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppleColors.greenLight,
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.verified_rounded,
-                                size: 11,
-                                color: AppleColors.green,
-                              ),
-                              SizedBox(width: 3),
-                              Text(
-                                'Active',
-                                style: TextStyle(
-                                  fontSize: 9.5,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppleColors.green,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Welcome, $firstName 👋',
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                        color: AppleColors.textPrimary,
-                        height: 1.2,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'Here’s an overview of your health information and care schedule.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        height: 1.4,
-                        color: AppleColors.textSecondary,
-                        letterSpacing: -0.1,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppleColors.groupedBackground,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.local_hospital_rounded,
-                            size: 15,
-                            color: AppleColors.blue,
-                          ),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              clinicName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppleColors.textPrimary,
-                                letterSpacing: -0.1,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 14),
-              PatientAvatarView(
-                patientId: patientId.isNotEmpty
-                    ? patientId
-                    : (fullName.isNotEmpty ? fullName : firstName),
-                fullName: fullName.isNotEmpty ? fullName : firstName,
-                size: 64,
-                showEditBadge: true,
-                onTap: onTapAvatar,
-              ),
-            ],
+          const SizedBox(width: 14),
+          PatientAvatarView(
+            patientId: patientId.isNotEmpty
+                ? patientId
+                : (fullName.isNotEmpty ? fullName : firstName),
+            fullName: fullName.isNotEmpty ? fullName : firstName,
+            size: 56,
+            showEditBadge: true,
+            onTap: onTapAvatar,
           ),
         ],
       ),
@@ -751,130 +641,99 @@ class _BookAppointmentHeroBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppleColors.blue,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: AppleColors.elevatedShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+    final radius = BorderRadius.circular(AppRadius.card);
+    return OneShotSheen(
+      borderRadius: radius,
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          gradient: AppleColors.brandGradient,
+          borderRadius: radius,
+          boxShadow: AppleColors.brandShadow,
+        ),
         child: Stack(
           children: [
+            // The logo mark, large and faint, bleeding off the corner.
+            Positioned(
+              right: -46,
+              top: -38,
+              child: Opacity(
+                opacity: 0.16,
+                child: ColorFiltered(
+                  colorFilter: const ColorFilter.mode(
+                    Colors.white,
+                    BlendMode.srcIn,
+                  ),
+                  child: Image.asset(
+                    'assets/images/logo-mark.png',
+                    width: 230,
+                    height: 230,
+                    excludeFromSemantics: true,
+                  ),
+                ),
+              ),
+            ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(999),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(8, 5, 12, 5),
+                    decoration: ShapeDecoration(
+                      color: Colors.white.withValues(alpha: 0.16),
+                      shape: const StadiumBorder(),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.add_circle_rounded,
+                          size: 16,
+                          color: Colors.white,
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.calendar_today_rounded, size: 12, color: Colors.white),
-                            SizedBox(width: 5),
-                            Text(
-                              'ONLINE APPOINTMENT',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.6,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(width: 6),
+                        Text(
+                          'Book a visit',
+                          style: AppType.label.copyWith(color: Colors.white),
                         ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF34C759).withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(
-                            color: const Color(0xFF34C759).withValues(alpha: 0.4),
-                            width: 0.8,
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.verified_rounded, size: 12, color: Colors.white),
-                            SizedBox(width: 4),
-                            Text(
-                              'Doctors Only',
-                              style: TextStyle(
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Book Doctor Appointment',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5,
+                  const SizedBox(height: 16),
+                  Text(
+                    'See a doctor this week',
+                    style: AppType.title.copyWith(
                       color: Colors.white,
-                      height: 1.2,
+                      fontSize: 26,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Schedule a consultation with our verified clinic specialists at your convenient date & time.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      height: 1.35,
-                      color: Colors.white.withValues(alpha: 0.9),
+                    'Choose a doctor and a time. Your token number arrives as soon as you book.',
+                    style: AppType.body.copyWith(
+                      color: AppleColors.brandOnDark,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                   Row(
                     children: [
                       Expanded(
                         child: AppleTapBounce(
                           onTap: onBookAppointment,
                           child: Container(
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.12),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
+                            height: 48,
                             alignment: Alignment.center,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.add_circle_rounded, size: 18, color: Color(0xFF0071E3)),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Book Appointment',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF0071E3),
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                              ],
+                            decoration: const ShapeDecoration(
+                              color: Colors.white,
+                              shape: StadiumBorder(),
+                            ),
+                            child: Text(
+                              'Book Appointment',
+                              style: AppType.button.copyWith(
+                                color: AppleColors.brandDeep,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
@@ -883,71 +742,22 @@ class _BookAppointmentHeroBanner extends StatelessWidget {
                       AppleTapBounce(
                         onTap: onOpenDoctors,
                         child: Container(
-                          height: 44,
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.35),
-                              width: 0.8,
+                          height: 48,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.center,
+                          decoration: ShapeDecoration(
+                            color: Colors.white.withValues(alpha: 0.14),
+                            shape: StadiumBorder(
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.45),
+                              ),
                             ),
                           ),
-                          alignment: Alignment.center,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.medical_services_outlined, size: 16, color: Colors.white),
-                              SizedBox(width: 6),
-                              Text(
-                                'Doctors',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
+                          child: Text(
+                            'Doctors',
+                            style: AppType.button.copyWith(color: Colors.white),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Wrap(
-                    spacing: 14,
-                    runSpacing: 4,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.local_hospital_outlined, size: 13, color: Colors.white.withValues(alpha: 0.8)),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Clinic Doctors',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.bolt_rounded, size: 14, color: Colors.white.withValues(alpha: 0.8)),
-                          const SizedBox(width: 3),
-                          Text(
-                            'Instant Token',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.white.withValues(alpha: 0.85),
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -980,78 +790,62 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = (constraints.maxWidth - 12) / 2;
-        return Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            SizedBox(
-              width: width,
-              child: _StatCard(
-                icon: Icons.calendar_month_rounded,
-                iconColor: AppleColors.blue,
-                iconBackground: AppleColors.blueLight,
-                countProgress: countProgress,
-                countTo: data.upcomingAppointments.length.toDouble(),
-                format: _wholeNumber,
-                label: 'Appointments',
-                subLabel: 'Upcoming visits',
-                onTap: () => onOpenTab(1),
-              ),
-            ),
-            SizedBox(
-              width: width,
-              child: _StatCard(
-                icon: Icons.folder_shared_rounded,
-                iconColor: AppleColors.purple,
-                iconBackground: AppleColors.purpleLight,
-                countProgress: countProgress,
-                countTo: data.documentsCount.toDouble(),
-                format: _wholeNumber,
-                label: 'Medical Records',
-                subLabel: 'Health documents',
-                onTap: () => onOpenTab(2),
-              ),
-            ),
-            SizedBox(
-              width: width,
-              child: _StatCard(
-                icon: Icons.medication_rounded,
-                iconColor: AppleColors.teal,
-                iconBackground: AppleColors.tealLight,
-                countProgress: countProgress,
-                countTo: data.prescriptions.length.toDouble(),
-                format: _wholeNumber,
-                label: 'Prescriptions',
-                subLabel: 'Active medications',
-                onTap: onOpenPrescriptions,
-              ),
-            ),
-            SizedBox(
-              width: width,
-              child: _StatCard(
-                icon: Icons.credit_card_rounded,
-                iconColor: data.outstandingTotal > 0
-                    ? AppleColors.orange
-                    : AppleColors.green,
-                iconBackground: data.outstandingTotal > 0
-                    ? AppleColors.orangeLight
-                    : AppleColors.greenLight,
-                countProgress: countProgress,
-                countTo: data.outstandingTotal,
-                format: formatMoney,
-                label: 'Bills & Invoices',
-                subLabel: data.outstandingTotal > 0
-                    ? 'Outstanding'
-                    : 'Settled',
-                onTap: () => onOpenTab(3),
-              ),
-            ),
-          ],
-        );
-      },
+    final owes = data.outstandingTotal > 0;
+    final tiles = [
+      _StatCard(
+        icon: Icons.event_available_outlined,
+        tint: AppleColors.brandLight,
+        iconColor: AppleColors.brand,
+        countProgress: countProgress,
+        countTo: data.upcomingAppointments.length.toDouble(),
+        format: _wholeNumber,
+        label: 'Visits',
+        onTap: () => onOpenTab(1),
+      ),
+      _StatCard(
+        icon: Icons.description_outlined,
+        tint: AppleColors.purpleLight,
+        iconColor: AppleColors.purple,
+        countProgress: countProgress,
+        countTo: data.documentsCount.toDouble(),
+        format: _wholeNumber,
+        label: 'Records',
+        onTap: () => onOpenTab(2),
+      ),
+      _StatCard(
+        icon: Icons.medication_outlined,
+        tint: AppleColors.tealLight,
+        iconColor: AppleColors.teal,
+        countProgress: countProgress,
+        countTo: data.prescriptions.length.toDouble(),
+        format: _wholeNumber,
+        label: 'Prescriptions',
+        onTap: onOpenPrescriptions,
+      ),
+      _StatCard(
+        icon: Icons.account_balance_wallet_outlined,
+        tint: owes ? AppleColors.orangeLight : AppleColors.greenLight,
+        iconColor: owes ? AppleColors.orange : AppleColors.green,
+        countProgress: countProgress,
+        countTo: data.outstandingTotal,
+        format: formatMoney,
+        label: owes ? 'Balance due' : 'Bills settled',
+        onTap: () => onOpenTab(3),
+      ),
+    ];
+    return Column(
+      children: [
+        for (var row = 0; row < 2; row++) ...[
+          if (row > 0) const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: tiles[row * 2]),
+              const SizedBox(width: 12),
+              Expanded(child: tiles[row * 2 + 1]),
+            ],
+          ),
+        ],
+      ],
     );
   }
 }
@@ -1059,100 +853,64 @@ class _StatsGrid extends StatelessWidget {
 class _StatCard extends StatelessWidget {
   const _StatCard({
     required this.icon,
+    required this.tint,
     required this.iconColor,
-    required this.iconBackground,
     required this.countProgress,
     required this.countTo,
     required this.format,
     required this.label,
-    required this.subLabel,
     required this.onTap,
   });
 
   final IconData icon;
+  final Color tint;
   final Color iconColor;
-  final Color iconBackground;
   final Animation<double> countProgress;
   final double countTo;
   final String Function(double) format;
   final String label;
-  final String subLabel;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return AppleTapBounce(
       onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppleColors.border, width: 0.8),
-          boxShadow: AppleColors.cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+      child: AppleSurface(
+        padding: const EdgeInsets.fromLTRB(16, 16, 14, 16),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: iconBackground,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, size: 20, color: iconColor),
-                ),
-                const Spacer(),
-                const Icon(
-                  Icons.arrow_outward_rounded,
-                  size: 16,
-                  color: AppleColors.textTertiary,
-                ),
-              ],
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
+              child: Icon(icon, size: 21, color: iconColor),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 26,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: AnimatedBuilder(
-                  animation: countProgress,
-                  builder: (context, _) => Text(
-                    format(countTo * countProgress.value),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.6,
-                      color: AppleColors.textPrimary,
-                      height: 1.1,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 32,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: AnimatedBuilder(
+                        animation: countProgress,
+                        builder: (context, _) => Text(
+                          format(countTo * countProgress.value),
+                          style: AppType.stat.copyWith(fontSize: 26),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: AppleColors.textPrimary,
-                letterSpacing: -0.2,
-              ),
-            ),
-            Text(
-              subLabel,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                color: AppleColors.textSecondary,
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppType.small,
+                  ),
+                ],
               ),
             ),
           ],
@@ -1163,11 +921,7 @@ class _StatCard extends StatelessWidget {
 }
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    this.actionLabel,
-    this.onAction,
-  });
+  const _SectionHeader({required this.title, this.actionLabel, this.onAction});
 
   final String title;
   final String? actionLabel;
@@ -1175,36 +929,24 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.4,
-              color: AppleColors.textPrimary,
-            ),
-          ),
-        ),
-        if (onAction != null && actionLabel != null)
-          AppleTapBounce(
-            onTap: onAction,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              child: Text(
-                actionLabel!,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppleColors.blue,
-                  letterSpacing: -0.1,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        children: [
+          Expanded(child: Text(title, style: AppType.heading)),
+          if (onAction != null && actionLabel != null)
+            AppleTapBounce(
+              onTap: onAction,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Text(
+                  actionLabel!,
+                  style: AppType.button.copyWith(color: AppleColors.brand),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -1230,7 +972,7 @@ class _NextAppointmentCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppleColors.border, width: 0.8),
           boxShadow: AppleColors.cardShadow,
         ),
@@ -1243,18 +985,21 @@ class _NextAppointmentCard extends StatelessWidget {
                   width: 56,
                   padding: const EdgeInsets.symmetric(vertical: 9),
                   decoration: BoxDecoration(
-                    color: AppleColors.blueLight,
+                    color: AppleColors.brandLight,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: AppleColors.blue.withValues(alpha: 0.15)),
+                    border: Border.all(
+                      color: AppleColors.brand.withValues(alpha: 0.15),
+                    ),
                   ),
                   child: Column(
                     children: [
                       Text(
                         date == null ? '—' : '${date.day}',
                         style: const TextStyle(
+                          fontFamily: AppType.displayFamily,
                           fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                          color: AppleColors.blue,
+                          fontWeight: FontWeight.w500,
+                          color: AppleColors.brand,
                           height: 1.05,
                         ),
                       ),
@@ -1263,13 +1008,15 @@ class _NextAppointmentCard extends StatelessWidget {
                         date == null
                             ? 'DATE'
                             : (formatShortDate(date).split(' ').isNotEmpty
-                                ? formatShortDate(date).split(' ').last.toUpperCase()
-                                : 'DATE'),
+                                  ? formatShortDate(
+                                      date,
+                                    ).split(' ').last.toUpperCase()
+                                  : 'DATE'),
                         style: const TextStyle(
                           fontSize: 9.5,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w600,
                           letterSpacing: 0.5,
-                          color: AppleColors.blue,
+                          color: AppleColors.brand,
                         ),
                       ),
                     ],
@@ -1289,7 +1036,7 @@ class _NextAppointmentCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
                                 fontSize: 14.5,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: AppleColors.textPrimary,
                                 letterSpacing: -0.2,
                               ),
@@ -1322,8 +1069,8 @@ class _NextAppointmentCard extends StatelessWidget {
                         children: [
                           StatusPill(
                             label: formatStatus(appointment.status),
-                            color: AppleColors.blue,
-                            background: AppleColors.blueLight,
+                            color: AppleColors.brand,
+                            background: AppleColors.brandLight,
                           ),
                           if (appointment.tokenNumber != null)
                             StatusPill(
@@ -1378,21 +1125,25 @@ class _NextAppointmentCard extends StatelessWidget {
                       child: Container(
                         height: 36,
                         decoration: BoxDecoration(
-                          color: AppleColors.blueLight,
+                          color: AppleColors.brandLight,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_rounded, size: 16, color: AppleColors.blue),
+                            Icon(
+                              Icons.add_rounded,
+                              size: 16,
+                              color: AppleColors.brand,
+                            ),
                             SizedBox(width: 4),
                             Text(
                               'Book Another',
                               style: TextStyle(
                                 fontSize: 12.5,
-                                fontWeight: FontWeight.w700,
-                                color: AppleColors.blue,
+                                fontWeight: FontWeight.w600,
+                                color: AppleColors.brand,
                               ),
                             ),
                           ],
@@ -1456,10 +1207,7 @@ class _DoctorsCarousel extends StatelessWidget {
 }
 
 class _DoctorMiniCard extends StatelessWidget {
-  const _DoctorMiniCard({
-    required this.doctor,
-    required this.onTap,
-  });
+  const _DoctorMiniCard({required this.doctor, required this.onTap});
 
   final DoctorEntry doctor;
   final VoidCallback onTap;
@@ -1473,7 +1221,7 @@ class _DoctorMiniCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppleColors.border, width: 0.8),
           boxShadow: AppleColors.cardShadow,
         ),
@@ -1487,7 +1235,7 @@ class _DoctorMiniCard extends StatelessWidget {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppleColors.blue,
+                    color: AppleColors.brand,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   alignment: Alignment.center,
@@ -1495,7 +1243,7 @@ class _DoctorMiniCard extends StatelessWidget {
                     initialsOf(doctor.name),
                     style: const TextStyle(
                       fontSize: 13,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
                   ),
@@ -1511,7 +1259,7 @@ class _DoctorMiniCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 12.5,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w600,
                           color: AppleColors.textPrimary,
                           letterSpacing: -0.2,
                         ),
@@ -1522,7 +1270,7 @@ class _DoctorMiniCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 10.5,
-                          color: AppleColors.blue,
+                          color: AppleColors.brand,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1540,7 +1288,7 @@ class _DoctorMiniCard extends StatelessWidget {
                       formatMoney(doctor.fee),
                       style: const TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: AppleColors.textPrimary,
                       ),
                     )
@@ -1568,21 +1316,25 @@ class _DoctorMiniCard extends StatelessWidget {
               height: 28,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppleColors.blueLight,
+                color: AppleColors.brandLight,
                 borderRadius: BorderRadius.circular(8),
               ),
               alignment: Alignment.center,
               child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.calendar_month_rounded, size: 12, color: AppleColors.blue),
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    size: 12,
+                    color: AppleColors.brand,
+                  ),
                   SizedBox(width: 4),
                   Text(
                     'Book Visit',
                     style: TextStyle(
                       fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppleColors.blue,
+                      fontWeight: FontWeight.w600,
+                      color: AppleColors.brand,
                     ),
                   ),
                 ],
@@ -1611,7 +1363,7 @@ class _FloatingBookButton extends StatelessWidget {
           height: 54,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: AppleColors.blue,
+            color: AppleColors.brand,
             boxShadow: AppleColors.elevatedShadow,
           ),
           alignment: Alignment.center,
@@ -1686,7 +1438,7 @@ class _OutstandingBanner extends StatelessWidget {
                 'View bills',
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: AppleColors.orange,
                 ),
               ),
@@ -1728,8 +1480,8 @@ class _QuickActions extends StatelessWidget {
                 icon: Icons.calendar_today_rounded,
                 title: 'Book Visit',
                 description: 'Schedule with doctor',
-                color: AppleColors.blue,
-                background: AppleColors.blueLight,
+                color: AppleColors.brand,
+                background: AppleColors.brandLight,
                 onTap: onBookAppointment,
               ),
             ),
@@ -1772,8 +1524,8 @@ class _QuickActions extends StatelessWidget {
                 icon: Icons.folder_shared_rounded,
                 title: 'Medical Records',
                 description: 'Reports & lab history',
-                color: const Color(0xFF6366F1),
-                background: const Color(0xFFEEF2FF),
+                color: AppleColors.purple,
+                background: AppleColors.purpleLight,
                 onTap: () => onOpenTab(2),
               ),
             ),
@@ -1820,7 +1572,7 @@ class _QuickActionCard extends StatelessWidget {
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppleColors.border, width: 0.8),
           boxShadow: AppleColors.cardShadow,
         ),
@@ -1853,7 +1605,7 @@ class _QuickActionCard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 13.5,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppleColors.textPrimary,
                 letterSpacing: -0.2,
               ),
@@ -1905,7 +1657,7 @@ class _RecentActivity extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppleColors.border, width: 0.8),
         boxShadow: AppleColors.cardShadow,
       ),
@@ -1915,11 +1667,7 @@ class _RecentActivity extends StatelessWidget {
           for (var i = 0; i < items.length; i++) ...[
             _ActivityRow(item: items[i]),
             if (i != items.length - 1)
-              const Divider(
-                height: 1,
-                indent: 56,
-                color: AppleColors.hairline,
-              ),
+              const Divider(height: 1, indent: 56, color: AppleColors.hairline),
           ],
         ],
       ),
@@ -1937,17 +1685,17 @@ class _RecentActivity extends StatelessWidget {
             final doctor = (appointment.doctorName ?? '').trim();
             final reason = (appointment.reason ?? '').trim();
             if (doctor.isNotEmpty && reason.isNotEmpty) {
-              return 'Dr. $doctor · $reason';
+              return '${doctorTitle(doctor)} · $reason';
             }
-            if (doctor.isNotEmpty) return 'Dr. $doctor';
+            if (doctor.isNotEmpty) return doctorTitle(doctor);
             if (reason.isNotEmpty) return reason;
             return 'Clinic visit';
           }(),
           date: formatDate(appointment.date, fallback: ''),
           sortDate: appointment.scheduledAt ?? parseApiDate(appointment.date),
           icon: Icons.calendar_month_rounded,
-          color: AppleColors.blue,
-          background: AppleColors.blueLight,
+          color: AppleColors.brand,
+          background: AppleColors.brandLight,
           onTap: () => onOpenAppointment(appointment),
         ),
       );
@@ -1976,9 +1724,9 @@ class _RecentActivity extends StatelessWidget {
             final doctor = (prescription.doctorName ?? '').trim();
             final diagnosis = (prescription.diagnosis ?? '').trim();
             if (doctor.isNotEmpty && diagnosis.isNotEmpty) {
-              return 'Dr. $doctor · $diagnosis';
+              return '${doctorTitle(doctor)} · $diagnosis';
             }
-            if (doctor.isNotEmpty) return 'Dr. $doctor';
+            if (doctor.isNotEmpty) return doctorTitle(doctor);
             if (diagnosis.isNotEmpty) return diagnosis;
             return 'Prescription';
           }(),
@@ -2079,7 +1827,7 @@ class _ActivityRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w600,
                       color: AppleColors.textPrimary,
                       letterSpacing: -0.1,
                     ),
@@ -2142,7 +1890,7 @@ class _SoftEmptyCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppleColors.border, width: 0.8),
         boxShadow: AppleColors.cardShadow,
       ),
@@ -2156,10 +1904,10 @@ class _SoftEmptyCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppleColors.blueLight,
+                  color: AppleColors.brandLight,
                   borderRadius: BorderRadius.circular(13),
                 ),
-                child: Icon(icon, size: 22, color: AppleColors.blue),
+                child: Icon(icon, size: 22, color: AppleColors.brand),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -2170,7 +1918,7 @@ class _SoftEmptyCard extends StatelessWidget {
                       title,
                       style: const TextStyle(
                         fontSize: 14.5,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: AppleColors.textPrimary,
                         letterSpacing: -0.2,
                       ),
@@ -2197,19 +1945,23 @@ class _SoftEmptyCard extends StatelessWidget {
                 height: 38,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: AppleColors.blue,
+                  color: AppleColors.brand,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.calendar_month_rounded, size: 15, color: Colors.white),
+                    const Icon(
+                      Icons.calendar_month_rounded,
+                      size: 15,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       actionLabel!,
                       style: const TextStyle(
                         fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                         letterSpacing: -0.1,
                       ),
@@ -2226,10 +1978,7 @@ class _SoftEmptyCard extends StatelessWidget {
 }
 
 class _AppointmentListTile extends StatelessWidget {
-  const _AppointmentListTile({
-    required this.appointment,
-    required this.onTap,
-  });
+  const _AppointmentListTile({required this.appointment, required this.onTap});
 
   final AppointmentEntry appointment;
   final VoidCallback onTap;
@@ -2247,7 +1996,7 @@ class _AppointmentListTile extends StatelessWidget {
               width: 42,
               padding: const EdgeInsets.symmetric(vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFFDBEAFE),
+                color: AppleColors.brandLight,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -2256,18 +2005,19 @@ class _AppointmentListTile extends StatelessWidget {
                     formatShortDate(appointment.date).split(' ').first,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1D4ED8),
+                      fontWeight: FontWeight.w600,
+                      color: AppleColors.brand,
                       height: 1.05,
                     ),
                   ),
                   Text(
-                    formatShortDate(appointment.date).split(' ').last
-                        .toUpperCase(),
+                    formatShortDate(
+                      appointment.date,
+                    ).split(' ').last.toUpperCase(),
                     style: const TextStyle(
                       fontSize: 8.5,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2563EB),
+                      fontWeight: FontWeight.w600,
+                      color: AppleColors.brand,
                     ),
                   ),
                 ],
@@ -2285,7 +2035,7 @@ class _AppointmentListTile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF0F172A),
+                      color: AppleColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -2297,7 +2047,7 @@ class _AppointmentListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 11.5,
-                      color: Color(0xFF64748B),
+                      color: AppleColors.textSecondary,
                     ),
                   ),
                 ],
@@ -2307,16 +2057,16 @@ class _AppointmentListTile extends StatelessWidget {
             StatusPill(
               label: formatStatus(appointment.status),
               color: appointment.isActive
-                  ? const Color(0xFF2563EB)
-                  : const Color(0xFF64748B),
+                  ? AppleColors.brand
+                  : AppleColors.textSecondary,
               background: appointment.isActive
-                  ? const Color(0xFFDBEAFE)
-                  : const Color(0xFFF1F5F9),
+                  ? AppleColors.brandLight
+                  : AppleColors.canvas,
             ),
             const Icon(
               Icons.chevron_right_rounded,
               size: 18,
-              color: Color(0xFFCBD5E1),
+              color: AppleColors.border,
             ),
           ],
         ),
@@ -2346,11 +2096,11 @@ class _PrescriptionListTile extends StatelessWidget {
           children: [
             const CircleAvatar(
               radius: 17,
-              backgroundColor: Color(0xFFCCFBF1),
+              backgroundColor: AppleColors.brandLight,
               child: Icon(
                 Icons.medication_outlined,
                 size: 17,
-                color: Color(0xFF0F766E),
+                color: AppleColors.brand,
               ),
             ),
             const SizedBox(width: 10),
@@ -2367,7 +2117,7 @@ class _PrescriptionListTile extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF0F172A),
+                      color: AppleColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -2378,7 +2128,7 @@ class _PrescriptionListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 11.5,
-                      color: Color(0xFF64748B),
+                      color: AppleColors.textSecondary,
                     ),
                   ),
                 ],
@@ -2390,13 +2140,13 @@ class _PrescriptionListTile extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF94A3B8),
+                color: AppleColors.textTertiary,
               ),
             ),
             const Icon(
               Icons.chevron_right_rounded,
               size: 18,
-              color: Color(0xFFCBD5E1),
+              color: AppleColors.border,
             ),
           ],
         ),
@@ -2423,9 +2173,9 @@ class _MedicineCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppleColors.canvas,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppleColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2435,7 +2185,7 @@ class _MedicineCard extends StatelessWidget {
               const Icon(
                 Icons.medication_liquid_outlined,
                 size: 16,
-                color: Color(0xFF0F766E),
+                color: AppleColors.brand,
               ),
               const SizedBox(width: 7),
               Expanded(
@@ -2443,8 +2193,8 @@ class _MedicineCard extends StatelessWidget {
                   medicine.name,
                   style: const TextStyle(
                     fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF0F172A),
+                    fontWeight: FontWeight.w600,
+                    color: AppleColors.textPrimary,
                   ),
                 ),
               ),
@@ -2457,7 +2207,7 @@ class _MedicineCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF475569),
+                color: AppleColors.textSecondary,
               ),
             ),
           ],
@@ -2468,7 +2218,7 @@ class _MedicineCard extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11.5,
                 height: 1.4,
-                color: Color(0xFF64748B),
+                color: AppleColors.textSecondary,
               ),
             ),
           ],
@@ -2490,12 +2240,15 @@ class _SheetEmpty extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 34),
       child: Column(
         children: [
-          Icon(icon, size: 40, color: const Color(0xFFCBD5E1)),
+          Icon(icon, size: 40, color: AppleColors.border),
           const SizedBox(height: 10),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+            style: const TextStyle(
+              fontSize: 13,
+              color: AppleColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -2519,7 +2272,7 @@ class _DashboardError extends StatelessWidget {
         const Icon(
           Icons.cloud_off_outlined,
           size: 52,
-          color: Color(0xFF94A3B8),
+          color: AppleColors.textTertiary,
         ),
         const SizedBox(height: 16),
         Text(
@@ -2528,7 +2281,7 @@ class _DashboardError extends StatelessWidget {
           style: const TextStyle(
             fontSize: 14,
             height: 1.45,
-            color: Color(0xFF475569),
+            color: AppleColors.textSecondary,
           ),
         ),
         const SizedBox(height: 20),

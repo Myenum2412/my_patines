@@ -7,6 +7,7 @@ import '../config/app_config.dart';
 import '../models/doctor_entry.dart';
 import '../models/patient_session.dart';
 import 'records_service.dart' show MedicalRecordFileEntry;
+import 'session_manager.dart';
 
 export '../models/doctor_entry.dart';
 
@@ -1031,12 +1032,16 @@ class PatientPortalService {
     String path, {
     Map<String, dynamic>? payload,
     int attempt = 0,
+    bool authRetried = false,
   }) async {
+    if (SessionManager.instance.isSignedIn) {
+      await SessionManager.instance.maybeRefresh();
+    }
     final uri = Uri.parse('${AppConfig.backendUrl}$path');
     final headers = <String, String>{
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ${session.token}',
+      'Authorization': 'Bearer ${SessionManager.instance.tokenFor(session)}',
     };
 
     try {
@@ -1062,6 +1067,23 @@ class PatientPortalService {
       final status = response.statusCode;
       if (status >= 200 && status < 300) {
         return body ?? const {};
+      }
+
+      // An expired token is recoverable: rotate it once and replay the call.
+      // Only a refresh the server rejects means the session is really gone.
+      if (status == 401 &&
+          !authRetried &&
+          SessionManager.instance.isSignedIn) {
+        final refreshed = await SessionManager.instance.refresh();
+        if (refreshed != null) {
+          return _requestJson(
+            method,
+            path,
+            payload: payload,
+            attempt: attempt,
+            authRetried: true,
+          );
+        }
       }
 
       final message = _extractMessage(body, response.body, status);

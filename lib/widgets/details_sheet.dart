@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'apple_ui.dart';
 
 import 'app_animations.dart';
 
@@ -14,7 +15,7 @@ Future<void> showDetailsSheet({
   required String title,
   String? subtitle,
   required IconData icon,
-  Color accent = const Color(0xFF2196F3),
+  Color accent = AppleColors.brand,
   required List<Widget> children,
   Widget? footer,
 }) {
@@ -67,7 +68,7 @@ Future<void> showDetailsSheet({
                     onClose: () => Navigator.of(dialogContext).pop(),
                     showDragHandle: false,
                   ),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                  const Divider(height: 1, color: AppleColors.border),
                   Flexible(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -80,7 +81,7 @@ Future<void> showDetailsSheet({
                     ),
                   ),
                   if (footer != null) ...[
-                    const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                    const Divider(height: 1, color: AppleColors.border),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(22, 14, 22, 20),
                       child: footer,
@@ -128,7 +129,7 @@ Future<void> showDetailsSheet({
               onClose: () => Navigator.of(sheetContext).pop(),
               showDragHandle: true,
             ),
-            const Divider(height: 1, color: Color(0xFFE2E8F0)),
+            const Divider(height: 1, color: AppleColors.border),
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -141,7 +142,7 @@ Future<void> showDetailsSheet({
               ),
             ),
             if (footer != null) ...[
-              const Divider(height: 1, color: Color(0xFFE2E8F0)),
+              const Divider(height: 1, color: AppleColors.border),
               SafeArea(
                 top: false,
                 child: Padding(
@@ -185,7 +186,7 @@ class _SheetHeader extends StatelessWidget {
             width: 36,
             height: 4.5,
             decoration: BoxDecoration(
-              color: const Color(0xFFD1D1D6),
+              color: AppleColors.border,
               borderRadius: BorderRadius.circular(999),
             ),
           ),
@@ -215,8 +216,8 @@ class _SheetHeader extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         fontSize: 17,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1D1D1F),
+                        fontWeight: FontWeight.w600,
+                        color: AppleColors.textPrimary,
                         letterSpacing: -0.3,
                         height: 1.25,
                       ),
@@ -230,7 +231,7 @@ class _SheetHeader extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF86868B),
+                          color: AppleColors.textSecondary,
                           letterSpacing: -0.1,
                         ),
                       ),
@@ -243,7 +244,7 @@ class _SheetHeader extends StatelessWidget {
                 height: 32,
                 margin: const EdgeInsets.only(top: 2),
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF2F2F7),
+                  color: AppleColors.canvas,
                   shape: BoxShape.circle,
                 ),
                 child: IconButton(
@@ -252,7 +253,7 @@ class _SheetHeader extends StatelessWidget {
                   onPressed: onClose,
                   icon: const Icon(
                     Icons.close_rounded,
-                    color: Color(0xFF86868B),
+                    color: AppleColors.textSecondary,
                     size: 18,
                   ),
                 ),
@@ -270,7 +271,7 @@ class DetailSection extends StatelessWidget {
     super.key,
     required this.title,
     this.icon,
-    this.accent = const Color(0xFF2196F3),
+    this.accent = AppleColors.brand,
     required this.children,
   });
 
@@ -296,9 +297,9 @@ class DetailSection extends StatelessWidget {
                 title.toUpperCase(),
                 style: const TextStyle(
                   fontSize: 11,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   letterSpacing: 0.7,
-                  color: Color(0xFF64748B),
+                  color: AppleColors.textSecondary,
                 ),
               ),
             ],
@@ -316,7 +317,7 @@ class DetailSectionTitle extends StatelessWidget {
     super.key,
     required this.title,
     this.icon,
-    this.accent = const Color(0xFF2196F3),
+    this.accent = AppleColors.brand,
   });
 
   final String title;
@@ -337,9 +338,9 @@ class DetailSectionTitle extends StatelessWidget {
             title.toUpperCase(),
             style: const TextStyle(
               fontSize: 11,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w600,
               letterSpacing: 0.7,
-              color: Color(0xFF64748B),
+              color: AppleColors.textSecondary,
             ),
           ),
         ],
@@ -370,7 +371,7 @@ class DetailField extends StatelessWidget {
           if (icon != null) ...[
             Padding(
               padding: const EdgeInsets.only(top: 2.5),
-              child: Icon(icon, size: 15, color: const Color(0xFF94A3B8)),
+              child: Icon(icon, size: 15, color: AppleColors.textTertiary),
             ),
             const SizedBox(width: 8),
           ],
@@ -383,7 +384,7 @@ class DetailField extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF94A3B8),
+                    color: AppleColors.textTertiary,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -392,7 +393,7 @@ class DetailField extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     height: 1.45,
-                    color: Color(0xFF0F172A),
+                    color: AppleColors.textPrimary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -423,7 +424,7 @@ class DetailAmountRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveColor = color ??
-        (emphasized ? const Color(0xFF0F172A) : const Color(0xFF475569));
+        (emphasized ? AppleColors.textPrimary : AppleColors.textSecondary);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.5),
       child: Row(
@@ -434,8 +435,8 @@ class DetailAmountRow extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: emphasized ? 14 : 13,
-                fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
-                color: emphasized ? const Color(0xFF0F172A) : const Color(0xFF64748B),
+                fontWeight: emphasized ? FontWeight.w600 : FontWeight.w500,
+                color: emphasized ? AppleColors.textPrimary : AppleColors.textSecondary,
               ),
             ),
           ),
@@ -445,7 +446,7 @@ class DetailAmountRow extends StatelessWidget {
             textAlign: TextAlign.right,
             style: TextStyle(
               fontSize: emphasized ? 16 : 13.5,
-              fontWeight: emphasized ? FontWeight.w800 : FontWeight.w600,
+              fontWeight: emphasized ? FontWeight.w600 : FontWeight.w600,
               color: effectiveColor,
             ),
           ),
@@ -479,7 +480,7 @@ class StatusPill extends StatelessWidget {
         label,
         style: TextStyle(
           fontSize: 11.5,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w600,
           color: color,
         ),
       ),

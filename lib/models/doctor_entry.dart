@@ -1,3 +1,5 @@
+import '../utils/formatters.dart';
+
 /// Doctor entity from the MyClinics clinic management system.
 ///
 /// Every value comes from the clinic's doctor records. Fields the backend
@@ -44,15 +46,7 @@ class DoctorEntry {
   bool get hasAvailability =>
       availableDays.isNotEmpty || availableHours.trim().isNotEmpty;
 
-  String get displayName {
-    final clean = name.trim();
-    if (clean.isEmpty) return 'Doctor';
-    if (clean.toLowerCase().startsWith('dr.') ||
-        clean.toLowerCase().startsWith('dr ')) {
-      return clean;
-    }
-    return 'Dr. $clean';
-  }
+  String get displayName => doctorTitle(name);
 
   String get shortSpecialization {
     final clean = specialization.trim();

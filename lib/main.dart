@@ -1,5 +1,4 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
@@ -7,49 +6,74 @@ import 'models/patient_session.dart';
 import 'screens/forgot_password_page.dart';
 import 'screens/patient_home_page.dart';
 import 'services/auth_service.dart';
+import 'services/session_manager.dart';
 import 'widgets/app_animations.dart';
+import 'widgets/app_theme.dart';
 import 'widgets/apple_ui.dart';
+
+/// Root navigator handle so a rejected session can be sent back to login from
+/// anywhere in the app (for example, a background API call returning 401).
+final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  SessionManager.instance.onExpired = _handleSessionExpired;
   runApp(const MyPatinesApp());
 }
 
-class MyPatinesApp extends StatelessWidget {
+void _handleSessionExpired() {
+  final navigator = appNavigatorKey.currentState;
+  if (navigator == null) return;
+  navigator.pushAndRemoveUntil(
+    fadeRoute<void>(
+      (_) => const LoginPage(
+        notice: 'Your session expired. Please sign in again.',
+      ),
+    ),
+    (route) => false,
+  );
+}
+
+class MyPatinesApp extends StatefulWidget {
   const MyPatinesApp({super.key});
+
+  @override
+  State<MyPatinesApp> createState() => _MyPatinesAppState();
+}
+
+class _MyPatinesAppState extends State<MyPatinesApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Slide the token forward when the patient comes back to the app, so a
+    // day of normal use never ends in a surprise "logged out" screen.
+    if (state == AppLifecycleState.resumed) {
+      SessionManager.instance.maybeRefresh();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Clinic',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scaffoldBackgroundColor: AppleColors.canvas,
-        colorScheme: const ColorScheme.light(
-          primary: AppleColors.blue,
-          secondary: AppleColors.blue,
-          surface: Colors.white,
-          error: AppleColors.red,
-        ),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: AppleColors.textPrimary,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-        ),
-        dividerColor: AppleColors.border,
-        useMaterial3: true,
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: {
-            TargetPlatform.android: FadeRisePageTransitionsBuilder(),
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          },
-        ),
-      ),
+      navigatorKey: appNavigatorKey,
+      theme: buildAppTheme(),
       home: const AuthGate(),
     );
   }
@@ -102,9 +126,11 @@ class _AuthGateState extends State<AuthGate>
   }
 
   Future<void> _bootstrap() async {
+    final animate = !reduceMotionOf(context);
+    final savedSession = await SessionStorage.load();
     final results = await Future.wait<Object?>([
-      SessionStorage.load(),
-      if (!reduceMotionOf(context)) _controller.forward(),
+      SessionManager.instance.restore(),
+      if (animate) _controller.forward(),
     ]);
     final session = results.first as PatientSession?;
     if (!mounted) return;
@@ -112,7 +138,11 @@ class _AuthGateState extends State<AuthGate>
       fadeRoute<void>(
         (_) => session != null
             ? PatientHomePage(session: session)
-            : const LoginPage(),
+            : LoginPage(
+                notice: savedSession != null
+                    ? 'Your session expired. Please sign in again.'
+                    : null,
+              ),
       ),
     );
   }
@@ -136,7 +166,7 @@ class _AuthGateState extends State<AuthGate>
                     shape: BoxShape.circle,
                     border: Border.all(
                       width: 2,
-                      color: AppleColors.blue.withValues(
+                      color: AppleColors.brand.withValues(
                         alpha: 0.35 * (1 - _ring.value),
                       ),
                     ),
@@ -163,7 +193,11 @@ class _AuthGateState extends State<AuthGate>
 }
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({super.key, this.notice});
+
+  /// Optional message shown once when the page opens (for example, when an
+  /// expired session was cleared).
+  final String? notice;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -177,6 +211,20 @@ class _LoginPageState extends State<LoginPage> {
   final _authService = const AuthService();
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final notice = widget.notice;
+    if (notice != null && notice.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(notice)),
+        );
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -244,9 +292,10 @@ class _LoginPageState extends State<LoginPage> {
         email: email,
         clinicName: _stringAt(result.data ?? const {}, const ['clinicName']) ??
             _stringAt(result.data ?? const {}, const ['clinic', 'name']),
+        expiresAt: result.expiresAt,
       );
 
-      await SessionStorage.save(session);
+      await SessionManager.instance.bind(session);
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
@@ -332,7 +381,7 @@ class _LoginPageState extends State<LoginPage> {
             right: -80,
             child: _AppleAmbientGlow(
               size: 340,
-              color: AppleColors.blue.withValues(alpha: 0.12),
+              color: AppleColors.brand.withValues(alpha: 0.12),
             ),
           ),
           Positioned(
@@ -412,7 +461,7 @@ class _LoginPageState extends State<LoginPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
                   color: AppleColors.textPrimary,
                   letterSpacing: -0.6,
                   height: 1.2,
@@ -478,7 +527,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: AppleColors.blue,
+                      color: AppleColors.brand,
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -595,7 +644,7 @@ class _LoginPageState extends State<LoginPage> {
       hintText: hint,
       hintStyle: const TextStyle(color: AppleColors.textTertiary, fontSize: 15),
       filled: true,
-      fillColor: const Color(0xFFFBFBFD),
+      fillColor: AppleColors.canvas,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
       prefixIcon: Icon(icon, size: 20, color: AppleColors.textSecondary),
       prefixIconConstraints: const BoxConstraints(minWidth: 46, minHeight: 46),
@@ -605,7 +654,7 @@ class _LoginPageState extends State<LoginPage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: AppleColors.blue, width: 1.6),
+        borderSide: const BorderSide(color: AppleColors.brand, width: 1.6),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

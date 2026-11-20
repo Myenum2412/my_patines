@@ -51,3 +51,20 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// Copy the built release APK to the Desktop after each release build.
+val desktopApkDir = "/home/j0k3r/Desktop"
+
+tasks.register<Copy>("copyApkToDesktop") {
+    from(layout.buildDirectory.dir("outputs/flutter-apk")) {
+        include("*.apk")
+    }
+    into(desktopApkDir)
+    doLast { logger.lifecycle("APK copied to $desktopApkDir") }
+}
+
+afterEvaluate {
+    listOf("assembleRelease", "assembleProfile").forEach { taskName ->
+        tasks.findByName(taskName)?.finalizedBy("copyApkToDesktop")
+    }
+}

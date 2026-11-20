@@ -212,7 +212,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
 
     final content = RefreshIndicator(
       onRefresh: refresh,
-      color: const Color(0xFF2196F3),
+      color: AppleColors.brand,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
@@ -234,12 +234,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
                   _dateScope == _AppointmentDateScope.today
                       ? "Today's Tokens (${list.length})"
                       : 'Appointments (${list.length})',
-                  style: const TextStyle(
-                    fontSize: 16.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                    color: Color(0xFF0F172A),
-                  ),
+                  style: AppType.heading,
                 ),
               ),
               if (isFilterActive) ...[
@@ -251,8 +246,8 @@ class AppointmentsTabState extends State<AppointmentsTab> {
                       'Reset',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppleColors.blue,
+                        fontWeight: FontWeight.w600,
+                        color: AppleColors.brand,
                       ),
                     ),
                   ),
@@ -264,7 +259,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
                 style: const TextStyle(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                 ),
               ),
             ],
@@ -275,34 +270,34 @@ class AppointmentsTabState extends State<AppointmentsTab> {
           Container(
             height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
+              color: AppleColors.canvas,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0), width: 0.8),
+              border: Border.all(color: AppleColors.border, width: 0.8),
             ),
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val),
               style: const TextStyle(
                 fontSize: 13,
-                color: Color(0xFF0F172A),
+                color: AppleColors.textPrimary,
                 fontWeight: FontWeight.w500,
               ),
               decoration: InputDecoration(
                 hintText: 'Search token #, doctor, or department...',
                 hintStyle: const TextStyle(
                   fontSize: 12,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                   fontWeight: FontWeight.w400,
                 ),
                 prefixIcon: const Icon(
                   Icons.search_rounded,
                   size: 18,
-                  color: Color(0xFF94A3B8),
+                  color: AppleColors.textTertiary,
                 ),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.close_rounded,
-                            size: 16, color: Color(0xFF64748B)),
+                            size: 16, color: AppleColors.textSecondary),
                         onPressed: () {
                           _searchController.clear();
                           setState(() => _searchQuery = '');
@@ -348,7 +343,7 @@ class AppointmentsTabState extends State<AppointmentsTab> {
                   height: 20,
                   width: 1,
                   margin: const EdgeInsets.symmetric(horizontal: 10),
-                  color: const Color(0xFFCBD5E1),
+                  color: AppleColors.border,
                 ),
                 _FilterPill(
                   label: 'All Status',
@@ -358,9 +353,9 @@ class AppointmentsTabState extends State<AppointmentsTab> {
                 ),
                 const SizedBox(width: 8),
                 _FilterPill(
-                  label: 'Incompleted',
+                  label: 'Waiting',
                   icon: Icons.hourglass_top_rounded,
-                  accentColor: AppleColors.blue,
+                  accentColor: AppleColors.brand,
                   selected:
                       _statusFilter == _AppointmentStatusFilter.incompleted,
                   onTap: () => setState(() =>
@@ -442,12 +437,14 @@ class _TokenHeroCard extends StatelessWidget {
     final now = DateTime.now();
     final todayFormatted = formatDate(now);
 
-    return Container(
+    return OneShotSheen(
+      borderRadius: BorderRadius.circular(AppRadius.card),
+      child: Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: const Color(0xFF1D1D1F),
-        boxShadow: AppleColors.elevatedShadow,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        gradient: AppleColors.brandGradient,
+        boxShadow: AppleColors.brandShadow,
       ),
       child: Stack(
         children: [
@@ -479,12 +476,11 @@ class _TokenHeroCard extends StatelessWidget {
                           ),
                           SizedBox(width: 6),
                           Text(
-                            'TOKEN DISPATCH & QUEUE',
+                            'Today\'s queue',
                             style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
                               color: Colors.white,
-                              letterSpacing: 0.6,
                             ),
                           ),
                         ],
@@ -511,11 +507,12 @@ class _TokenHeroCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  "Today's Clinic Tokens",
+                  "Today's tokens",
                   style: TextStyle(
+                    fontFamily: AppType.displayFamily,
                     fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.5,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: -0.3,
                     color: Colors.white,
                   ),
                 ),
@@ -534,9 +531,9 @@ class _TokenHeroCard extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _HeroStatBox(
-                        label: 'Incompleted',
+                        label: 'Waiting',
                         count: incompletedCount,
-                        color: const Color(0xFF60A5FA),
+                        color: AppleColors.brandOnDark,
                         icon: Icons.hourglass_top_rounded,
                       ),
                     ),
@@ -545,7 +542,7 @@ class _TokenHeroCard extends StatelessWidget {
                       child: _HeroStatBox(
                         label: 'Completed',
                         count: completedCount,
-                        color: const Color(0xFF34D399),
+                        color: AppleColors.brandOnDark,
                         icon: Icons.check_circle_rounded,
                       ),
                     ),
@@ -557,18 +554,16 @@ class _TokenHeroCard extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onBookAppointment,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppleColors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppleColors.brand,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: const StadiumBorder(),
                     ),
                     icon: const Icon(Icons.add_circle_outline_rounded, size: 17),
                     label: const Text(
                       'Book New Token',
                       style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -577,6 +572,7 @@ class _TokenHeroCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -616,8 +612,9 @@ class _HeroStatBox extends StatelessWidget {
               Text(
                 '$count',
                 style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w800,
+                  fontFamily: AppType.displayFamily,
+                  fontSize: 19,
+                  fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),
               ),
@@ -658,9 +655,9 @@ class _TokenCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(
-            color: completed ? const Color(0xFFE2E8F0) : AppleColors.blue.withValues(alpha: 0.3),
+            color: completed ? AppleColors.border : AppleColors.brand.withValues(alpha: 0.3),
             width: completed ? 0.8 : 1.2,
           ),
           boxShadow: AppleColors.cardShadow,
@@ -675,19 +672,18 @@ class _TokenCard extends StatelessWidget {
                 width: 78,
                 decoration: BoxDecoration(
                   color: completed
-                      ? const Color(0xFF248A3D)
-                      : AppleColors.blue,
+                      ? AppleColors.green
+                      : AppleColors.brand,
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'TOKEN',
+                      'Token',
                       style: TextStyle(
-                        fontSize: 9.5,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white70,
                       ),
                     ),
@@ -695,9 +691,10 @@ class _TokenCard extends StatelessWidget {
                     Text(
                       token != null ? '#$token' : '--',
                       style: const TextStyle(
+                        fontFamily: AppType.displayFamily,
                         fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -1.0,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: -0.3,
                         color: Colors.white,
                       ),
                     ),
@@ -709,12 +706,11 @@ class _TokenCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        appointment.session?.toUpperCase() ?? 'SLOT',
+                        appointment.session ?? 'Slot',
                         style: const TextStyle(
-                          fontSize: 8.5,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
                           color: Colors.white,
-                          letterSpacing: 0.4,
                         ),
                       ),
                     ),
@@ -746,7 +742,7 @@ class _TokenCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 14.5,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w600,
                                     color: AppleColors.textPrimary,
                                     letterSpacing: -0.2,
                                   ),
@@ -758,7 +754,7 @@ class _TokenCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 11,
-                                    color: AppleColors.blue,
+                                    color: AppleColors.brand,
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -782,7 +778,7 @@ class _TokenCard extends StatelessWidget {
                             appointment.time ?? '10:00 AM',
                             style: const TextStyle(
                               fontSize: 11.5,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                               color: AppleColors.textPrimary,
                             ),
                           ),
@@ -792,7 +788,7 @@ class _TokenCard extends StatelessWidget {
                                 horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: isToday
-                                  ? AppleColors.blueLight
+                                  ? AppleColors.brandLight
                                   : AppleColors.groupedBackground,
                               borderRadius: BorderRadius.circular(6),
                             ),
@@ -800,9 +796,9 @@ class _TokenCard extends StatelessWidget {
                               isToday ? 'Today' : formatDate(appointment.date),
                               style: TextStyle(
                                 fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
+                                fontWeight: FontWeight.w600,
                                 color: isToday
-                                    ? AppleColors.blue
+                                    ? AppleColors.brand
                                     : AppleColors.textSecondary,
                               ),
                             ),
@@ -857,7 +853,7 @@ class _StatusBadge extends StatelessWidget {
               'Completed',
               style: TextStyle(
                 fontSize: 10.5,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w600,
                 color: AppleColors.green,
               ),
             ),
@@ -869,20 +865,20 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppleColors.blueLight,
+        color: AppleColors.brandLight,
         borderRadius: BorderRadius.circular(999),
       ),
       child: const Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.hourglass_top_rounded, size: 12, color: AppleColors.blue),
+          Icon(Icons.hourglass_top_rounded, size: 12, color: AppleColors.brand),
           SizedBox(width: 4),
           Text(
-            'Incompleted',
+            'Waiting',
             style: TextStyle(
               fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-              color: AppleColors.blue,
+              fontWeight: FontWeight.w600,
+              color: AppleColors.brand,
             ),
           ),
         ],
@@ -908,7 +904,7 @@ class _FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeBg = accentColor ?? AppleColors.blue;
+    final activeBg = accentColor ?? AppleColors.brand;
 
     return AppleTapBounce(
       onTap: onTap,
@@ -923,15 +919,6 @@ class _FilterPill extends StatelessWidget {
             color: selected ? activeBg : AppleColors.border,
             width: 0.8,
           ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: activeBg.withValues(alpha: 0.28),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : AppleColors.cardShadow,
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -948,7 +935,7 @@ class _FilterPill extends StatelessWidget {
               label,
               style: TextStyle(
                 fontSize: 12,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w600,
                 color: selected ? Colors.white : AppleColors.textPrimary,
                 letterSpacing: -0.1,
               ),
@@ -991,7 +978,7 @@ class _TokenSlipModal extends StatelessWidget {
               width: 38,
               height: 4.5,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: AppleColors.border,
                 borderRadius: BorderRadius.circular(999),
               ),
             ),
@@ -1005,9 +992,10 @@ class _TokenSlipModal extends StatelessWidget {
                       Text(
                         'Appointment Token Slip',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.3,
+                          fontFamily: AppType.displayFamily,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: -0.2,
                           color: AppleColors.textPrimary,
                         ),
                       ),
@@ -1035,7 +1023,7 @@ class _TokenSlipModal extends StatelessWidget {
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 color: AppleColors.canvas,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.card),
                 border: Border.all(color: AppleColors.border),
               ),
               child: Column(
@@ -1050,7 +1038,7 @@ class _TokenSlipModal extends StatelessWidget {
                             'ASSIGNED TOKEN',
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w600,
                               letterSpacing: 1.0,
                               color: AppleColors.textSecondary,
                             ),
@@ -1058,11 +1046,12 @@ class _TokenSlipModal extends StatelessWidget {
                           Text(
                             token != null ? '#$token' : '--',
                             style: TextStyle(
+                              fontFamily: AppType.displayFamily,
                               fontSize: 34,
-                              fontWeight: FontWeight.w900,
+                              fontWeight: FontWeight.w500,
                               color: completed
                                   ? AppleColors.green
-                                  : AppleColors.blue,
+                                  : AppleColors.brand,
                             ),
                           ),
                         ],
@@ -1094,7 +1083,7 @@ class _TokenSlipModal extends StatelessWidget {
               child: FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppleColors.blue,
+                  backgroundColor: AppleColors.brand,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
@@ -1103,7 +1092,7 @@ class _TokenSlipModal extends StatelessWidget {
                 ),
                 child: const Text(
                   'Done',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -1132,7 +1121,7 @@ class _TokenSlipModal extends StatelessWidget {
             style: const TextStyle(
               fontSize: 12.5,
               color: AppleColors.textPrimary,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -1165,7 +1154,7 @@ class _TokensEmptyState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 36),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         border: Border.all(color: AppleColors.border),
       ),
       child: Column(
@@ -1174,18 +1163,18 @@ class _TokensEmptyState extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: AppleColors.blueLight,
-              borderRadius: BorderRadius.circular(18),
+              color: AppleColors.brandLight,
+              borderRadius: BorderRadius.circular(AppRadius.card),
             ),
             child: const Icon(Icons.event_busy_rounded,
-                size: 30, color: AppleColors.blue),
+                size: 30, color: AppleColors.brand),
           ),
           const SizedBox(height: 14),
           Text(
             title,
             style: const TextStyle(
               fontSize: 16,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               color: AppleColors.textPrimary,
             ),
           ),
@@ -1215,7 +1204,7 @@ class _TokensEmptyState extends StatelessWidget {
               FilledButton(
                 onPressed: onBookAppointment,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppleColors.blue,
+                  backgroundColor: AppleColors.brand,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -1245,7 +1234,7 @@ class _AppointmentsError extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.error_outline_rounded,
-                size: 44, color: Color(0xFFEF4444)),
+                size: 44, color: AppleColors.red),
             const SizedBox(height: 12),
             Text(
               message,
@@ -1258,7 +1247,7 @@ class _AppointmentsError extends StatelessWidget {
             const SizedBox(height: 16),
             FilledButton(
               onPressed: onRetry,
-              style: FilledButton.styleFrom(backgroundColor: AppleColors.blue),
+              style: FilledButton.styleFrom(backgroundColor: AppleColors.brand),
               child: const Text('Retry'),
             ),
           ],
